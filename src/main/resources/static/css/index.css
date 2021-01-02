@@ -1,0 +1,171 @@
+/*左侧菜单*/
+.sidebar {
+    z-index: 10;
+    bottom: 0;
+    position: fixed !important;
+    transition: all .2s ease-out;
+    top: 0;
+}
+
+.mt-topbar {
+    margin-top: 70px;
+}
+
+/*它的滚动条*/
+.sidebar > * .simplebar-scrollbar::before {
+    background-color: grey;
+}
+
+.simplebar-content {
+    padding-left: 0 !important;
+}
+
+.sidebar .nav-link {
+    color: #6c757d;
+    display: block;
+    padding: 15px 30px 15px 15px;
+    position: relative;
+    -webkit-transition: all .4s;
+    transition: all .4s;
+    border: 1px solid transparent;
+}
+
+/*.side-nav .side-nav-link:active,*/
+.sidebar .nav-link.active {
+    color: var(--blue);
+    background: #57A6FF77 !important;
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 30px;
+    text-decoration: none
+}
+
+/*.side-nav .side-nav-link:focus,*/
+.sidebar .nav-link:hover {
+    color: var(--blue);
+    background: lightgray;
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 30px;
+    text-decoration: none
+}
+
+.side-nav .side-nav-link span {
+    vertical-align: middle
+}
+
+.side-nav .side-nav-link i {
+    display: inline-block;
+    line-height: 1.0625rem;
+    margin: 0 10px 0 0;
+    font-size: 1.1rem;
+    vertical-align: middle;
+    width: 20px
+}
+
+.side-nav .menu-arrow {
+    position: absolute;
+    right: 15px;
+}
+
+.side-nav .badge {
+    margin-top: 3px
+}
+
+.side-nav .side-nav-item a .menu-arrow::before {
+    transition: all 0.25s;
+    transform: rotate(180deg)
+}
+
+.side-nav .side-nav-item a.collapsed .menu-arrow::before {
+    transform: rotate(0deg)
+}
+
+/* top */
+.search-bar {
+    background: #f1f3f4;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    display: flex;
+}
+
+.search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    height: 3rem;
+    flex-grow: 1;
+}
+
+.search-bar:focus-within {
+    background: white;
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.search-bar .search-icon {
+    font-size: 1.5rem;
+    color: gray;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    outline: none;
+}
+
+.search-bar .search-icon:hover {
+    background: lightgray;
+}
+
+/* 详情页 */
+
+.details-pagination {
+    float: right
+}
+
+.details-pagination .page-link {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.details-content {
+    clear: right;
+}
+
+/* Dashboard */
+
+.flex-cards-md {
+    gap: 20px 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+}
+
+.card-wrapper {
+    flex: 1 0 auto;
+}
+
+.card-md {
+    width: 30rem;
+    margin: auto;
+}
+
+h5 > a, h5 > a:hover, h5 > a:visited {
+    color: black;
+}
+
+.result-card-row {
+    display: flex;
+}
+
+.result-card-row .caption {
+    min-width: 60%;
+}
+
+/* 常用 */
+.left {
+    /*display: block;*/
+    float: left;
+}
+
+.right {
+    /*display: block;*/
+    float: right;
+}

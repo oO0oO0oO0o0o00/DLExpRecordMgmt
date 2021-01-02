@@ -190,8 +190,9 @@ function setPageActive(selector, active) {
     }
 }
 
-$(document).ready(e => setPage(page));
-
-$(window).on('resize', () => {
-    if (!!chart) chart.resize();
+$(document).ready(e => {
+    if (page !== null) setPage(page);
+    let $sb = $('#top-search-bar-input');
+    $sb.on('focusin', e => $(e.target).attr('placeholder', "这tm有啥好搜索的，憨批"));
+    $sb.on('focusout', e => $(e.target).attr('placeholder', "猪"));
 });

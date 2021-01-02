@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -22,19 +22,22 @@ public class MeowController {
     public ModelAndView request(
             @RequestParam(value = "selected-record", required = false) String selectedRecordName) {
         ModelAndView mv = new ModelAndView("index");
-        List<String> records = meowService.getRecordsNames();
-        if (records == null) mv.addObject("failed", true);
+        List<String> names = meowService.getRecordsNames();
+        if (names == null) mv.addObject("failed", true);
         else {
-            mv.addObject("records", records);
-            if (!records.contains(selectedRecordName))
+            mv.addObject("recordNames", names);
+            if (!names.contains(selectedRecordName))
                 selectedRecordName = null;
-            mv.addObject("selectedRecordName", selectedRecordName);
+            ExperimentRecord selectedRecord;
             if (selectedRecordName != null) {
-                ExperimentRecord record = meowService.getRecord(selectedRecordName);
-                mv.addObject("selectedRecord", record);
+                selectedRecord = meowService.getRecord(selectedRecordName);
             } else {
-                // TODO: Dashboard
+                selectedRecord = null;
+                var records = new ArrayList<ExperimentRecord>();
+                for (var recordName : names) records.add(0, meowService.getRecord(recordName));
+                mv.addObject("featuredRecords", records);
             }
+            mv.addObject("selectedRecord", selectedRecord);
         }
         return mv;
     }
