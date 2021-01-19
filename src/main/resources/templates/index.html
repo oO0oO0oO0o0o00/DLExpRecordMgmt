@@ -12,6 +12,7 @@
     <script th:src="@{/bootstrap-4.5.3-dist/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/simplebar.min.js}"></script>
     <script th:src="@{/chart.js-2.9.4/Chart.min.js}"></script>
+    <script th:src="@{/js/vue.js}"></script>
     <script th:if="${null eq selectedRecord}">
         var page = null;
     </script>
@@ -38,7 +39,7 @@
 </nav>
 <div class="container-fluid">
     <div class="row mt-topbar">
-        <nav class="col-md-2 d-none d-md-block sidebar mt-topbar" data-simplebar>
+        <nav class="col-md-2 d-none d-md-block sidebar mt-topbar" id="left-bar" data-simplebar>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${selectedRecord eq null} ? 'active'" href="?">
@@ -72,46 +73,44 @@
                 </li>
             </ul>
         </nav>
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-            <th:block th:if="${selectedRecord ne null}">
-            <h1>Summary</h1>
-            <br/>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">index</th>
-                    <th scope="col" th:each="i: ${#numbers.sequence(1, selectedRecord.folds)}" th:text="${i}"></th>
-                    <th scope="col">Average</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="metric: ${selectedRecord.metrics}" th:with="fracs=${metric eq 'loss' ? 2 : 3}">
-                <tr>
-                    <th scope="row" th:text="${metric}"></th>
-                    <td th:each="i: ${#numbers.sequence(0, selectedRecord.folds - 1)}">
-                        <th:block
-                                th:text="${#numbers.formatDecimal(selectedRecord.listOfFinalScores?.get(i)?.get(metric)?.mean,0,fracs)}"/>
-                    </td>
-                    <td>
-                        <th:block
-                                th:text="${#numbers.formatDecimal(selectedRecord.averagedFinalScores?.get(metric)?.mean,0,fracs)}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><span class="sr-only" th:text="${'std of ' + metric}"></span></th>
-                    <td th:each="i: ${#numbers.sequence(0, selectedRecord.folds - 1)}">±
-                        <th:block
-                                th:text="${#numbers.formatDecimal(selectedRecord.listOfFinalScores?.get(i)?.get(metric)?.std,0,fracs)}"/>
-                    </td>
-                    <td>±
-                        <th:block
-                                th:text="${#numbers.formatDecimal(selectedRecord.averagedFinalScores?.get(metric)?.std,0,fracs)}"/>
-                    </td>
-                </tr>
-                </th:block>
-                </tbody>
-            </table>
-            <h1>Details</h1>
+    </div>
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <th:block th:if="${selectedRecord ne null}">
+        <h1>Summary</h1>
+        <br/>
+        <table id="summary-table" class="table">
+            <thead>
+            <tr>
+                <th scope="col">index</th>
+                <th scope="col" th:each="i: ${#numbers.sequence(1, selectedRecord.folds)}" th:text="${i}"></th>
+                <th scope="col">Average</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="metric: ${selectedRecord.metrics}" th:if="${metric ne 'loss'}">
+            <tr>
+                <th scope="row" th:text="${metric}"></th>
+                <td th:each="i: ${#numbers.sequence(0, selectedRecord.folds - 1)}">
+                    <span class="digits" th:data-value="${selectedRecord.listOfFinalScores?.get(i)?.get(metric)?.mean}"></span>
+                </td>
+                <td>
+                    <span class="digits" th:data-value="${selectedRecord.averagedFinalScores?.get(metric)?.mean}"></span>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="sr-only" th:text="${'std of ' + metric}"></span></th>
+                <td th:each="i: ${#numbers.sequence(0, selectedRecord.folds - 1)}">
+                    ±<span class="digits"
+                           th:data-value="${selectedRecord.listOfFinalScores?.get(i)?.get(metric)?.std}"></span>
+                </td>
+                <td>
+                    ±<span class="digits" th:data-value="${selectedRecord.averagedFinalScores?.get(metric)?.std}"></span>
+                </td>
+            </tr>
+            </th:block>
+            </tbody>
+        </table>
+        <div class="d-flex">
             <nav class="details-pagination"
                  aria-label="Page navigation indicating which fold it is of among k-fold validation results.">
                 <ul class="pagination" id="pagination">
@@ -134,38 +133,66 @@
                     </li>
                 </ul>
             </nav>
-            <a style="display:none" id="req-detail-href" th:href="@{/detail}" th:attr="data=${selectedRecord.id}"></a>
-            <div class="row details-content">
-                <div class="col-sm-6" id="charts-1">
-                </div>
-                <div class="col-sm-6" id="charts-2">
-                </div>
-                <div class="col-sm-6" id="charts-3">
-                </div>
-                <div class="col-sm-6" id="charts-4">
+            <form class="form-inline ml-auto mr-md-5 pr-md-5">
+                <label for="table-digits-range">Digits: </label>
+                <input v-model="digits" type="range" id="table-digits-range" min="2"
+                       max="4" v-on:change="change"/>
+            </form>
+        </div>
+        <h1>Details</h1>
+        <a style="display:none" id="req-detail-href" th:href="@{/detail}" th:attr="data=${selectedRecord.id}"></a>
+        <div class="row details-content">
+            <div class="col-sm-6" id="charts-1">
+            </div>
+            <div class="col-sm-6" id="charts-2">
+            </div>
+            <div class="col-sm-6" id="charts-3">
+            </div>
+            <div class="col-sm-6" id="charts-4">
+            </div>
+        </div>
+        <script>
+            var vueEditCoordinatesModalAreaSelect = new Vue({
+                el: '#table-digits-range',
+                data: {
+                    digits: 3
+                },
+                methods: {
+                    change() {
+                        $('#summary-table .digits').each((i, e) => {
+                            $e = $(e);
+                            let num = Number($e.attr('data-value'));
+                            $e.text(isNaN(num) ? '-' : num.toFixed(this.$data.digits));
+                        })
+                    }
+                },
+                created() {
+                    this.change();
+                },
+            });
+            vueEditCoordinatesModalAreaSelect.$data.digits = 3;
+            $(document).ready(_ => $('#left-bar .active')[0].scrollIntoView({block: "center"}));
+        </script>
+        </th:block>
+        <th:block th:unless="${selectedRecord ne null}">
+        <div class="flex-cards-md">
+            <div class="card card-md" th:each="record: ${featuredRecords}">
+                <div class="card-body">
+                    <div class="card-title"><h5>
+                        <a th:text="${record.id}" th:href="@{/(selected-record=${record.id})}"></a>
+                    </h5></div>
+                    <p class="card-text result-card-row" th:each="metric: ${record.metrics}"
+                       th:if="${metric ne 'loss'}"
+                       th:with="val=${record.averagedFinalScores?.get(metric)}">
+                        <span class="caption" th:text="${metric}"></span>
+                        <span
+                                th:text="${#numbers.formatDecimal(val?.mean,0,3)+'±'+#numbers.formatDecimal(val?.std,0,3)}"></span>
+                    </p>
                 </div>
             </div>
-            </th:block>
-            <th:block th:unless="${selectedRecord ne null}">
-            <div class="flex-cards-md">
-                <div class="card card-md" th:each="record: ${featuredRecords}">
-                    <div class="card-body">
-                        <div class="card-title"><h5>
-                            <a th:text="${record.id}" th:href="@{/(selected-record=${record.id})}"></a>
-                        </h5></div>
-                        <p class="card-text result-card-row" th:each="metric: ${record.metrics}"
-                           th:if="${metric ne 'loss'}"
-                           th:with="val=${record.averagedFinalScores?.get(metric)}">
-                            <span class="caption" th:text="${metric}"></span>
-                            <span
-                                    th:text="${#numbers.formatDecimal(val?.mean,0,3)+'±'+#numbers.formatDecimal(val?.std,0,3)}"></span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            </th:block>
-        </main>
-    </div>
+        </div>
+        </th:block>
+    </main>
 </div>
 <div class="modal fade" id="aboutModal" data-backdrop="static" tabindex="-1"
      aria-labelledby="aboutModalLabel" aria-hidden="true">

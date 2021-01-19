@@ -117,19 +117,6 @@
 
 /* 详情页 */
 
-.details-pagination {
-    float: right
-}
-
-.details-pagination .page-link {
-    padding-left: 25px;
-    padding-right: 25px;
-}
-
-.details-content {
-    clear: right;
-}
-
 /* Dashboard */
 
 .flex-cards-md {
@@ -157,15 +144,4 @@ h5 > a, h5 > a:hover, h5 > a:visited {
 
 .result-card-row .caption {
     min-width: 60%;
-}
-
-/* 常用 */
-.left {
-    /*display: block;*/
-    float: left;
-}
-
-.right {
-    /*display: block;*/
-    float: right;
 }
