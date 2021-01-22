@@ -1,3 +1,14 @@
+function toBjutLibziyuan(url) {
+    if (!url.includes('://'))
+        url = 'http://' + url;
+    a = new URL(url);
+    b = a.hostname.replaceAll('.', '-');
+    if (a.port) b += '-' + a.port + '-p'
+    if (a.protocol === 'https:') b += '-s';
+    return 'http://' + b + '.libziyuan.bjut.edu.cn:8118' + a.pathname;
+}
+
+
 function setPage(new_page) {
     // TODO: parameterize this:
     let selector_prefix = '#pagination ';

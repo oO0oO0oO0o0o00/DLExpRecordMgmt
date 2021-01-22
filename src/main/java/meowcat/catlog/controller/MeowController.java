@@ -22,11 +22,12 @@ public class MeowController {
     public ModelAndView request(
             @RequestParam(value = "selected-record", required = false) String selectedRecordName) {
         ModelAndView mv = new ModelAndView("index");
-        List<String> names = meowService.getRecordsNames();
-        if (names == null) mv.addObject("failed", true);
+        List<ExperimentRecord> allRecords = meowService.getRecordsBrief();
+        if (allRecords == null) mv.addObject("failed", true);
         else {
-            mv.addObject("recordNames", names);
-            if (!names.contains(selectedRecordName))
+            mv.addObject("allRecords", allRecords);
+            String requested = selectedRecordName;
+            if (selectedRecordName == null || allRecords.stream().noneMatch(experimentRecord -> requested.equals(experimentRecord.getId())))
                 selectedRecordName = null;
             ExperimentRecord selectedRecord;
             if (selectedRecordName != null) {
@@ -34,7 +35,7 @@ public class MeowController {
             } else {
                 selectedRecord = null;
                 var records = new ArrayList<ExperimentRecord>();
-                for (var recordName : names) records.add(0, meowService.getRecord(recordName));
+                for (var recordName : allRecords) records.add(0, meowService.getRecord(recordName.getId()));
                 mv.addObject("featuredRecords", records);
             }
             mv.addObject("selectedRecord", selectedRecord);

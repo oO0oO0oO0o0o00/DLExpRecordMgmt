@@ -9,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service("MeowService")
 public class MeowServiceImpl implements MeowService {
@@ -21,12 +18,19 @@ public class MeowServiceImpl implements MeowService {
     private static final String MANIFEST_FILENAME = "manifest.json";
 
     @Override
-    public List<String> getRecordsNames() {
+    public List<ExperimentRecord> getRecordsBrief() {
         File dir = getDir();
-        String[] list = dir.list((self, filename) -> new File(new File(self, filename), MANIFEST_FILENAME).isFile());
+        String[] list = dir.list();
         if (list == null) return null;
         Arrays.sort(list);
-        return Arrays.asList(list);
+        var results = new ArrayList<ExperimentRecord>();
+        for (var filename : list) {
+            File manifest = new File(new File(dir, filename), MANIFEST_FILENAME);
+            if (manifest.isFile())
+                results.add(ExperimentRecord.fromJson(filename, Objects.requireNonNull(IoUtil.readJson(manifest))));
+        }
+        results.sort(Comparator.comparing(ExperimentRecord::getId));
+        return results;
     }
 
     @NotNull

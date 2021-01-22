@@ -15,6 +15,8 @@ public class ExperimentRecord implements Serializable {
 
     private String id;
 
+    private String name;
+
     private int folds;
 
     private int repeats;
@@ -120,9 +122,19 @@ public class ExperimentRecord implements Serializable {
     public static ExperimentRecord fromJson(String id, JsonValue json) {
         ExperimentRecord record = new ExperimentRecord(id);
         JsonObject jsonObject = json.asObject();
+        JsonValue name = jsonObject.get("name");
+        if (name != null && !name.isNull()) record.name = name.asString();
         record.folds = jsonObject.get("k-fold").asInt();
         record.repeats = jsonObject.get("repeats").asInt();
         return record;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public static class MeanAndStd implements Serializable {

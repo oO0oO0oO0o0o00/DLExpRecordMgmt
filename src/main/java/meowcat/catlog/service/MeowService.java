@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface MeowService {
 
-    List<String> getRecordsNames();
+    List<ExperimentRecord> getRecordsBrief();
 
     ExperimentRecord getRecord(String id);
 

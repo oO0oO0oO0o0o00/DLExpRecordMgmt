@@ -43,7 +43,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${selectedRecord eq null} ? 'active'" href="?">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                              class="feather feather-home">
@@ -54,11 +54,11 @@
                         <span class="sr-only" th:if="${selectedRecord eq null}">(current)</span>
                     </a>
                 </li>
-                <li class="nav-item" th:each="recordName: ${recordNames}">
+                <li class="nav-item" th:each="someRecord: ${allRecords}">
                     <a class="nav-link"
-                       th:classappend="${recordName eq selectedRecord?.id} ? 'active'"
-                       th:href="@{/(selected-record=${recordName})}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                       th:classappend="${someRecord.id eq selectedRecord?.id} ? 'active'"
+                       th:href="@{/(selected-record=${someRecord.id})}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
                              stroke-linejoin="round"
@@ -66,8 +66,10 @@
                             <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
                             <polyline points="13 2 13 9 20 9"></polyline>
                         </svg>
-                        <th:block th:text="${recordName}"/>
-                        <span class="sr-only" th:if="${recordName eq selectedRecord?.id}">
+                        <small th:text="${someRecord.id}"></small>
+                        <br/>
+                        <small th:text="${someRecord.name}"></small>
+                        <span class="sr-only" th:if="${someRecord.id eq selectedRecord?.id}">
                             (current)</span>
                     </a>
                 </li>
@@ -181,6 +183,7 @@
                     <div class="card-title"><h5>
                         <a th:text="${record.id}" th:href="@{/(selected-record=${record.id})}"></a>
                     </h5></div>
+                    <p class="card-text result-card-row" th:if="${record.name ne null}" th:text="${record.name}"></p>
                     <p class="card-text result-card-row" th:each="metric: ${record.metrics}"
                        th:if="${metric ne 'loss'}"
                        th:with="val=${record.averagedFinalScores?.get(metric)}">
