@@ -1,7 +1,7 @@
 package meowcat.catlog.controller.meow_bonn_metric;
 
-import meowcat.catlog.model.ExperimentRecord;
-import meowcat.catlog.service.MeowService;
+import meowcat.catlog.model.meow_bonn_metric.ExperimentRecord;
+import meowcat.catlog.service.meow_bonn_metric.MeowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/")
+@RequestMapping(value = "/meow-bonn")
 public class MeowController {
 
     @Autowired

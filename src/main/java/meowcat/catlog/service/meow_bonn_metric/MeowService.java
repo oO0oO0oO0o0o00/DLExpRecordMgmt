@@ -1,6 +1,6 @@
-package meowcat.catlog.service;
+package meowcat.catlog.service.meow_bonn_metric;
 
-import meowcat.catlog.model.ExperimentRecord;
+import meowcat.catlog.model.meow_bonn_metric.ExperimentRecord;
 
 import java.util.List;
 

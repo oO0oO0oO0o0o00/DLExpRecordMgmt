@@ -57,7 +57,7 @@
                 <li class="nav-item" th:each="someRecord: ${allRecords}">
                     <a class="nav-link"
                        th:classappend="${someRecord.id eq selectedRecord?.id} ? 'active'"
-                       th:href="@{/(selected-record=${someRecord.id})}">
+                       th:href="@{/meow-bonn/(selected-record=${someRecord.id})}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -142,7 +142,8 @@
             </form>
         </div>
         <h1>Details</h1>
-        <a style="display:none" id="req-detail-href" th:href="@{/detail}" th:attr="data=${selectedRecord.id}"></a>
+        <a style="display:none" id="req-detail-href" th:href="@{/meow-bonn/detail}"
+           th:attr="data=${selectedRecord.id}"></a>
         <div class="row details-content">
             <div class="col-sm-6" id="charts-1">
             </div>
@@ -181,14 +182,14 @@
             <div class="card card-md" th:each="record: ${featuredRecords}">
                 <div class="card-body">
                     <div class="card-title"><h5>
-                        <a th:text="${record.id}" th:href="@{/(selected-record=${record.id})}"></a>
+                        <a th:text="${record.id}" th:href="@{/meow-bonn/(selected-record=${record.id})}"></a>
                     </h5></div>
                     <p class="card-text result-card-row">
                         <span class="caption" th:if="${record.name ne null}" th:text="${record.name}"></span>
                         <a class="link-delete-weights"
                            th:attr="data-name=${record.name}"
                            th:if="${record.hasSavedWeights}"
-                           th:href="@{/delete-weights(id=${record.id})}">delete weights</a>
+                           th:href="@{/meow-bonn/delete-weights(id=${record.id})}">delete weights</a>
                     </p>
                     <p class="card-text result-card-row" th:each="metric: ${record.metrics}"
                        th:if="${metric ne 'loss'}"

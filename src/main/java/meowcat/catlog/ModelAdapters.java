@@ -1,6 +1,6 @@
 package meowcat.catlog;
 
-import meowcat.catlog.model.ExperimentRecord;
+import meowcat.catlog.model.meow_bonn_metric.ExperimentRecord;
 
 public class ModelAdapters {
 

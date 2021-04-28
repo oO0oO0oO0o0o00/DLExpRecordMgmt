@@ -1,16 +1,15 @@
-package meowcat.catlog.service.impl;
+package meowcat.catlog.service.impl.meow_bonn_metric;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import meowcat.catlog.model.ExperimentRecord;
-import meowcat.catlog.service.MeowService;
+import meowcat.catlog.model.meow_bonn_metric.ExperimentRecord;
+import meowcat.catlog.service.meow_bonn_metric.MeowService;
 import meowcat.catlog.util.IoUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
 import org.apache.commons.io.FileUtils;

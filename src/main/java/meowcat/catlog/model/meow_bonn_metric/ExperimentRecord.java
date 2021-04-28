@@ -1,4 +1,4 @@
-package meowcat.catlog.model;
+package meowcat.catlog.model.meow_bonn_metric;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
