@@ -21,6 +21,8 @@ public class ExperimentRecord implements Serializable {
 
     private int repeats;
 
+    private boolean hasSavedWeights;
+
     private List<String> metrics;
 
     private List<Map<String, MeanAndStd>> listOfFinalScores;
@@ -135,6 +137,14 @@ public class ExperimentRecord implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isHasSavedWeights() {
+        return hasSavedWeights;
+    }
+
+    public void setHasSavedWeights(boolean hasSavedWeights) {
+        this.hasSavedWeights = hasSavedWeights;
     }
 
     public static class MeanAndStd implements Serializable {

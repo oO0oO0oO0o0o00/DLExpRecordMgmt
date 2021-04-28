@@ -11,4 +11,6 @@ public interface MeowService {
     ExperimentRecord getRecord(String id);
 
     String getDetail(String id, int ithFold);
+
+    boolean deleteWeights(String id);
 }

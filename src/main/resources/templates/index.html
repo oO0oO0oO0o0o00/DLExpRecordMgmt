@@ -183,7 +183,13 @@
                     <div class="card-title"><h5>
                         <a th:text="${record.id}" th:href="@{/(selected-record=${record.id})}"></a>
                     </h5></div>
-                    <p class="card-text result-card-row" th:if="${record.name ne null}" th:text="${record.name}"></p>
+                    <p class="card-text result-card-row">
+                        <span class="caption" th:if="${record.name ne null}" th:text="${record.name}"></span>
+                        <a class="link-delete-weights"
+                           th:attr="data-name=${record.name}"
+                           th:if="${record.hasSavedWeights}"
+                           th:href="@{/delete-weights(id=${record.id})}">delete weights</a>
+                    </p>
                     <p class="card-text result-card-row" th:each="metric: ${record.metrics}"
                        th:if="${metric ne 'loss'}"
                        th:with="val=${record.averagedFinalScores?.get(metric)}">
@@ -192,6 +198,13 @@
                                 th:text="${#numbers.formatDecimal(val?.mean,0,3)+'±'+#numbers.formatDecimal(val?.std,0,3)}"></span>
                     </p>
                 </div>
+            </div>
+        </div>
+        <div id="toast-host" class="position-fixed w-100 d-flex flex-column p-4" style="bottom:0">
+        </div>
+        <div id="toast-template-wrapper" style="display: none">
+            <div class="toast" role="alert" data-delay="700">
+                <div class="toast-body"></div>
             </div>
         </div>
         </th:block>

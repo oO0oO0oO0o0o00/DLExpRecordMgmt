@@ -117,9 +117,6 @@ function onGotContent(data, status, xhr) {
 }
 
 function loadContent(page) {
-    // <div class="chart-container">
-    //     <canvas id="chart"></canvas>
-    // </div>
     let $req = $('#req-detail-href');
     $.ajax({
         url: $req.attr('href'),
@@ -131,33 +128,6 @@ function loadContent(page) {
         dataType: 'json',
         success: onGotContent
     });
-    // chart = echarts.init(document.getElementById('chart'));
-    //
-    // // 指定图表的配置项和数据
-    // let option = {
-    //     responsive: true,
-    //     maintainAspectRatio: true,
-    //     aspectRatio: 1,
-    //     title: {
-    //         text: 'ECharts 入门示例'
-    //     },
-    //     tooltip: {},
-    //     legend: {
-    //         data: ['销量']
-    //     },
-    //     xAxis: {
-    //         data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-    //     },
-    //     yAxis: {},
-    //     series: [{
-    //         name: '销量',
-    //         type: 'bar',
-    //         data: [5, 20, 36, 10, 10, 20]
-    //     }]
-    // };
-    //
-    // // 使用刚指定的配置项和数据显示图表。
-    // chart.setOption(option);
 }
 
 function getPageNumberSelector(which) {
@@ -201,9 +171,36 @@ function setPageActive(selector, active) {
     }
 }
 
+function requestDeleteWeights(e) {
+    let target = e.currentTarget;
+    let name = target.getAttribute('data-name');
+    name = name ? `"${name}"` : "the record"
+    if (confirm(`Delete weights of "${name}"?`))
+        $.ajax(target.href, {
+            sucscess(data, status, xhr) {
+                console.log(data);
+                toast("已删除~");
+                target.remove();
+            },
+        });
+    return false;
+}
+
+function toast(text, config) {
+    // 任意数量toast，很辣鸡的实现
+    // 就是 从模板复制到toast站，显示完移除
+    let $toast = $('#toast-template-wrapper .toast').clone();
+    $('#toast-host').append($toast);
+    $toast.find('.toast-body').text(text);
+    if (config) $toast.toast(config);
+    $toast.toast('show');
+    $toast.on('hidden.bs.toast', e => $(e.currentTarget).remove());
+}
+
 $(document).ready(e => {
     if (page !== null) setPage(page);
     let $sb = $('#top-search-bar-input');
     $sb.on('focusin', e => $(e.target).attr('placeholder', "这tm有啥好搜索的，憨批"));
     $sb.on('focusout', e => $(e.target).attr('placeholder', "猪"));
+    $('.link-delete-weights').click(requestDeleteWeights);
 });

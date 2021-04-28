@@ -9,7 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
+
+import org.apache.commons.io.FileUtils;
 
 @Service("MeowService")
 public class MeowServiceImpl implements MeowService {
@@ -25,7 +29,8 @@ public class MeowServiceImpl implements MeowService {
         Arrays.sort(list);
         var results = new ArrayList<ExperimentRecord>();
         for (var filename : list) {
-            File manifest = new File(new File(dir, filename), MANIFEST_FILENAME);
+            File recordDir = new File(dir, filename);
+            File manifest = new File(recordDir, MANIFEST_FILENAME);
             if (manifest.isFile())
                 results.add(ExperimentRecord.fromJson(filename, Objects.requireNonNull(IoUtil.readJson(manifest))));
         }
@@ -45,6 +50,8 @@ public class MeowServiceImpl implements MeowService {
         File dir = new File(getDir(), id);
         File manifest = new File(dir, MANIFEST_FILENAME);
         ExperimentRecord record = ExperimentRecord.fromJson(id, Objects.requireNonNull(IoUtil.readJson(manifest)));
+        if (dir.listFiles((file) -> file.isDirectory() && file.getName().startsWith("weights-")).length > 0)
+            record.setHasSavedWeights(true);
         List<JsonObject> jsonObjects = new ArrayList<>(record.getFolds());
         for (int i = 0; i < record.getFolds(); i++) {
             File file = new File(dir, i + "_metrics.json");
@@ -61,5 +68,19 @@ public class MeowServiceImpl implements MeowService {
     @Override
     public String getDetail(String id, int ithFold) {
         return Objects.requireNonNull(IoUtil.readJson(new File(new File(getDir(), id), ithFold + "_results.json"))).toString();
+    }
+
+    @Override
+    public boolean deleteWeights(String id) {
+        File dir = new File(getDir(), id);
+        for (var file : dir.listFiles((file) -> file.isDirectory() && file.getName().startsWith("weights-"))) {
+            try {
+                FileUtils.deleteDirectory(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
     }
 }

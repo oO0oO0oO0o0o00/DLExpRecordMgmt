@@ -1,4 +1,4 @@
-package meowcat.catlog.controller;
+package meowcat.catlog.controller.meow_bonn_metric;
 
 import meowcat.catlog.service.MeowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,15 @@ public class MeowRestController {
 
     @RequestMapping("detail")
     public String getDetail(
-            @RequestParam("record") String recordName,
+            @RequestParam("record") String id,
             @RequestParam("ith") String ithFoldString
     ) {
         int ithFold = Integer.parseInt(ithFoldString);
-        return meowService.getDetail(recordName, ithFold);
+        return meowService.getDetail(id, ithFold);
     }
 
+    @RequestMapping("delete-weights")
+    public String deleteWeights(@RequestParam("id") String id) {
+        return meowService.deleteWeights(id) ? "true" : "false";
+    }
 }

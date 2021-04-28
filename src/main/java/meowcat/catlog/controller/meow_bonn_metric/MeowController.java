@@ -1,4 +1,4 @@
-package meowcat.catlog.controller;
+package meowcat.catlog.controller.meow_bonn_metric;
 
 import meowcat.catlog.model.ExperimentRecord;
 import meowcat.catlog.service.MeowService;
