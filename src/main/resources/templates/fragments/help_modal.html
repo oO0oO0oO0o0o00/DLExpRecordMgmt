@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="help-modal" class="modal fade" id="aboutModal" data-backdrop="static" tabindex="-1"
+     aria-labelledby="aboutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aboutModalLabel">About...</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>用于自动显示实验结果以供分析。</p>
+                <p>
+                    目前需要预先在代码中配置实验结果根目录，
+                    然后运行（Tomcat等容器，或直接打包运行jar）。
+                    你的实验代码应该能够自动按指定格式保存结果，
+                    才能正确显示。
+                    目前的范式是：
+                    （一项）实验->多次不同配置下的子实验->K折（不用K折时，可为1）。
+                    多次不同配置下的子实验建议以纯数字符号的日期时间命名。
+                    具体参照当前。
+                </p>
+                <p>欢迎修改以支持多项实验的结果，并使用数据库保存配置。</p>
+                <p>喵~</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">嗷~</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

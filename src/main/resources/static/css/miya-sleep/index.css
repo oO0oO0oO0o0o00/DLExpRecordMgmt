@@ -1,0 +1,19 @@
+/* Dashboard */
+/*h5 > a, h5 > a:hover, h5 > a:visited {*/
+/*    color: black;*/
+/*}*/
+
+.nav-cat.active {
+    background: transparent !important;
+    outline: none;
+}
+
+.nav-cat.active span {
+    background: #57A6FF77 !important;
+    border-radius: 30px;
+    padding: .32rem .64rem !important;
+}
+
+#models-summary-host img {
+    max-width: 100%;
+}

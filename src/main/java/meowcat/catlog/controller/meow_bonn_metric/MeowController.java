@@ -21,7 +21,7 @@ public class MeowController {
     @RequestMapping
     public ModelAndView request(
             @RequestParam(value = "selected-record", required = false) String selectedRecordName) {
-        ModelAndView mv = new ModelAndView("index");
+        ModelAndView mv = new ModelAndView("meow_bonn_metric/index");
         List<ExperimentRecord> allRecords = meowService.getRecordsBrief();
         if (allRecords == null) mv.addObject("failed", true);
         else {

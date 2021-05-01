@@ -18,7 +18,7 @@
     </script>
     <script th:if="${null ne selectedRecord}">
         var page = 1;
-        var max_page = [[${selectedRecord.folds}]];
+        var max_page = [[${selected_record.folds}]];
     </script>
     <script th:src="@{/js/index.js}"></script>
 </head>

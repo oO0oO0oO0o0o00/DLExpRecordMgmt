@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "meowcat.catlog.ssh.known_hosts_dir",
+      "type": "java.lang.String",
+      "description": "Description for meowcat.catlog.ssh.known_hosts_dir."
+  }
+] }
