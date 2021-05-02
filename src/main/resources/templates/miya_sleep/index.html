@@ -179,16 +179,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade show" id="nav-details-prediction" role="tabpanel"
-                     aria-labelledby="nav-details-prediction-tab">3
+                <div class="tab-pane fade show col-12" id="nav-details-prediction" role="tabpanel"
+                     aria-labelledby="nav-details-prediction-tab"
+                     th:href="@{/api/miya-sleep/prediction/{id}(id=${selected_record.folderName})}">
+                    <img/>
                 </div>
                 <div class="tab-pane fade show" id="nav-details-config" role="tabpanel"
-                     aria-labelledby="nav-details-config-tab">4
+                     aria-labelledby="nav-details-config-tab"
+                     th:href="@{/miya-sleep/config/{id}(id=${selected_record.folderName})}">
                 </div>
             </div>
             </th:block>
             <th:block th:unless="${selected_record ne null}">
             <div class="flex-cards-md"></div>
+            <div class="align-content-center">not done yet, use left bar instead</div>
             <div id="toast-host" class="position-fixed w-100 d-flex flex-column p-4" style="bottom:0">
             </div>
             <div id="toast-template-wrapper" style="display: none">

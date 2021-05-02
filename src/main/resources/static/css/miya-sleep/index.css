@@ -11,9 +11,13 @@
 .nav-cat.active span {
     background: #57A6FF77 !important;
     border-radius: 30px;
-    padding: .32rem .64rem !important;
+    padding: .32rem .64rem;
 }
 
-#models-summary-host img {
+#models-summary-host img{
     max-width: 100%;
+}
+
+#nav-details-prediction img{
+    width: 100%;
 }

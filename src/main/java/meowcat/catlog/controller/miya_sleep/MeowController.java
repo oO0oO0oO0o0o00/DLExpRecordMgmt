@@ -4,10 +4,13 @@ import meowcat.catlog.model.miya_sleep.ExperimentRecord;
 import meowcat.catlog.service.miya_sleep.MeowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,6 +35,14 @@ public class MeowController {
             mv.addObject("selected_record", allRecords.stream()
                     .filter(experimentRecord -> Objects.equals(selectedRecordName, experimentRecord.getFolderName()))
                     .findAny().orElse(allRecords.size() > 0 ? allRecords.get(0) : null));
+        return mv;
+    }
+
+    @GetMapping("config/{record-id}")
+    public ModelAndView getConfigViewer(
+            @PathVariable("record-id") String recordId) throws IOException {
+        ModelAndView mv = new ModelAndView("miya_sleep/code_viewer");
+        mv.addObject("code", meowService.getRecord(recordId).getConfigFile());
         return mv;
     }
 }

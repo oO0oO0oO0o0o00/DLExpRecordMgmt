@@ -46,6 +46,7 @@ public class MeowServiceImpl implements MeowService {
                         }
                     })
                     .map(ExperimentRecord::new)
+                    .sorted(Comparator.comparing(ExperimentRecord::getFolderName))
                     .collect(Collectors.toList());
         } catch (FileSystemException | RuntimeException e) {
             logger.warn("Cannot get experiment records list of result directory.", e);

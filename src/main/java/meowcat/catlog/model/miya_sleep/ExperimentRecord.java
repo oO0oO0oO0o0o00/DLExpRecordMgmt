@@ -4,10 +4,13 @@ import meowcat.catlog.util.IoUtil;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.util.FileObjectUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -91,5 +94,13 @@ public class ExperimentRecord implements Serializable {
 
     public FileContent getModelSummaryImage(String id) throws FileSystemException {
         return directory.getChild("summary").getChild(id+".png").getContent();
+    }
+
+    public FileContent getPredictionImage() throws FileSystemException {
+        return directory.getChild("visualize.svg").getContent();
+    }
+
+    public String getConfigFile() throws IOException {
+        return FileObjectUtils.getContentAsString(directory.getChild("config.py"), StandardCharsets.UTF_8);
     }
 }

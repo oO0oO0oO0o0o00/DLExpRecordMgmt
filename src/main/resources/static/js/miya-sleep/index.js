@@ -54,7 +54,7 @@ function loadDetailsPageTrainingCharts($pageElement) {
     })
 }
 
-function displayModelsSummary(url, data){
+function displayModelsSummary(url, data) {
     for (let key of Object.keys(data)) {
         let $wrapper = $('#models-summary-template-wrapper div').clone();
         $('#models-summary-host').append($wrapper);
@@ -76,12 +76,12 @@ function loadDetailsPageModels($pageElement) {
     })
 }
 
-function loadDetailsPagePredictionVisualization(pageElement) {
-    pageElement.text('33');
+function loadDetailsPagePredictionVisualization() {
+    $('#nav-details-prediction img').attr('src', $('#nav-details-prediction').attr('href'));
 }
 
-function loadDetailsPageConfigFile(pageElement) {
-    pageElement.text('44');
+function loadDetailsPageConfigFile($pageElement) {
+    $pageElement.load($pageElement.attr('href'));
 }
 
 function loadDetailsPage(tab) {
@@ -97,7 +97,7 @@ function loadDetailsPage(tab) {
             loadDetailsPageModels(target);
             break;
         case '#nav-details-prediction':
-            loadDetailsPagePredictionVisualization(target);
+            loadDetailsPagePredictionVisualization();
             break;
         case '#nav-details-config':
             loadDetailsPageConfigFile(target);
@@ -106,10 +106,12 @@ function loadDetailsPage(tab) {
 }
 
 $(document).ready(e => {
+    // search bar
     let $sb = $('#top-search-bar-input');
     $sb.on('focusin', e => $(e.target).attr('placeholder', "这tm有啥好搜索的，憨批"));
     $sb.on('focusout', e => $(e.target).attr('placeholder', "猪"));
 
+    // summary panel -> progress -> help
     $('#error-time-too-old').attr('title',
         'The experiment han\'t updated its progress for more than 10 minutes and is likely failed. ' +
         'Difference in time and time zone settings between the host of this platform and the ' +
@@ -120,8 +122,12 @@ $(document).ready(e => {
         'experiments run on shall be identical.')
     $('[data-toggle="tooltip"]').tooltip()
 
+    // detail panels -> handle loading && load default (first) page
     $('#nav-detail-panels .nav-item').on('show.bs.tab', function (e) {
         loadDetailsPage($(this));
     })
     loadDetailsPage($('#nav-detail-panels .nav-item.active'))
+
+    // left bar -> scroll to current
+    $('#left-bar .active')[0].scrollIntoView({block: "center"})
 });
