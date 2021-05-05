@@ -3,6 +3,7 @@ package meowcat.catlog.service.impl.miya_sleep;
 import meowcat.catlog.config.VFSOptions;
 import meowcat.catlog.model.miya_sleep.ExperimentRecord;
 import meowcat.catlog.service.miya_sleep.MeowService;
+import meowcat.catlog.util.IoUtil;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,33 +23,33 @@ public class MeowServiceImpl implements MeowService {
 
     private final Logger logger = LogManager.getLogger(this);
 
-    @Value("${meowcat.catlog.ssh.known_hosts_dir}")
-    private String knownHostsDir;
-
     @Autowired
     private VFSOptions vfsOptions;
 
-//    @Autowired
-//    private SftpService sftpService;
-
     @Override
     public List<ExperimentRecord> getRecords() {
-        var resultsDir = getResultsDir();
-        if (resultsDir == null) return null;
-        try {
-            return Arrays.stream(resultsDir.getChildren())
-                    .filter(fileObject -> {
-                        try {
-                            return fileObject.isFolder();
-                        } catch (FileSystemException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .map(ExperimentRecord::new)
-                    .sorted(Comparator.comparing(ExperimentRecord::getFolderName))
-                    .collect(Collectors.toList());
-        } catch (FileSystemException | RuntimeException e) {
-            logger.warn("Cannot get experiment records list of result directory.", e);
+        try (var resultsDir = getResultsDir()) {
+            if (resultsDir == null) return null;
+            List<ExperimentRecord> result = null;
+            try {
+                result = Arrays.stream(resultsDir.getChildren())
+                        .filter(fileObject -> {
+                            try {
+                                return fileObject.isFolder();
+                            } catch (FileSystemException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .map(ExperimentRecord::new)
+                        .sorted(Comparator.comparing(ExperimentRecord::getFolderName))
+                        .collect(Collectors.toList());
+                return result;
+            } catch (FileSystemException | RuntimeException e) {
+                logger.warn("Cannot get experiment records list of result directory.", e);
+                return result;
+            }
+        } catch (FileSystemException e) {
+            logger.warn("cannot get records", e);
             return null;
         }
     }

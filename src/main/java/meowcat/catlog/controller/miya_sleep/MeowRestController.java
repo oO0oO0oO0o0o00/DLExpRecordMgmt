@@ -33,15 +33,18 @@ public class MeowRestController {
     public void getModelSummaryImage(
             @PathVariable("record") String recordId, @PathVariable("model-id") String modelId,
             HttpServletResponse response) throws IOException {
-        var img= meowService.getRecord(recordId).getModelSummaryImage(modelId);
-        img.getInputStream().transferTo(response.getOutputStream());
+        try (var img = meowService.getRecord(recordId).getModelSummaryImage(modelId)) {
+            response.setContentType("image/png");
+            img.getContent().getInputStream().transferTo(response.getOutputStream());
+        }
     }
 
     @RequestMapping("prediction/{record}")
     public void getPredictionImage(
             @PathVariable("record") String recordId, HttpServletResponse response) throws IOException {
-        var img= meowService.getRecord(recordId).getPredictionImage();
-        response.setContentType("image/svg+xml");
-        img.getInputStream().transferTo(response.getOutputStream());
+        try (var img = meowService.getRecord(recordId).getPredictionImage()) {
+            response.setContentType("image/svg+xml");
+            img.getContent().getInputStream().transferTo(response.getOutputStream());
+        }
     }
 }

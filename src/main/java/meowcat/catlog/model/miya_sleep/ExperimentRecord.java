@@ -39,28 +39,41 @@ public class ExperimentRecord implements Serializable {
     }
 
     public Map<String, Object> getSummary() throws FileSystemException {
-        if (summary == null)
+        if (summary == null) {
             summary = getJsonFileAsMap("summary.json");
+            IoUtil.close(directory);
+        }
         return summary;
     }
 
     public Map<String, Object> getScores() throws FileSystemException {
-        if (scores == null)
+        if (scores == null) {
             scores = getJsonFileAsMap("scores.json");
+            IoUtil.close(directory);
+        }
         return scores;
     }
 
     public String getHistory() throws FileSystemException {
         // all right i know these things shall be in service layer but whatever
-        if (history == null)
-            history = IoUtil.readText(directory.getChild("history.json"));
+        if (history == null) {
+            history = getTextFileContent(directory, "history.json");
+            IoUtil.close(directory);
+        }
         return history;
+    }
+
+    private static String getTextFileContent(FileObject directory, String s) throws FileSystemException {
+        try (var file = directory.getChild(s)) {
+            return IoUtil.readText(file);
+        }
     }
 
     @NotNull
     private Map<String, Object> getJsonFileAsMap(String s) throws FileSystemException {
-        return Objects.requireNonNull(
-                IoUtil.readJson(directory.getChild(s)));
+        try (var file = directory.getChild(s)) {
+            return Objects.requireNonNull(IoUtil.readJson(file));
+        }
     }
 
     public String getFolderName() {
@@ -68,8 +81,10 @@ public class ExperimentRecord implements Serializable {
     }
 
     public Map<String, Object> getProgress() throws FileSystemException {
-        if (progress == null)
+        if (progress == null) {
             progress = getJsonFileAsMap("progress.json");
+            IoUtil.close(directory);
+        }
         return progress;
     }
 
@@ -77,7 +92,7 @@ public class ExperimentRecord implements Serializable {
         if (heartBeatStatus == null) {
             var progress = getProgress();
             var heartBeatTime = LocalDateTime.ofInstant(
-                    Instant.ofEpochSecond(((Integer)progress.get("time"))), ZoneId.systemDefault());
+                    Instant.ofEpochSecond(((Integer) progress.get("time"))), ZoneId.systemDefault());
             var diff = ChronoUnit.SECONDS.between(heartBeatTime, LocalDateTime.now()) / 60.0;
             if (diff > 15) heartBeatStatus = -1;
             else if (diff < -5) heartBeatStatus = 1;
@@ -87,20 +102,36 @@ public class ExperimentRecord implements Serializable {
     }
 
     public String getModelsSummaryIndex() throws FileSystemException {
-        if (modelsSummaryIndex == null)
-            modelsSummaryIndex = IoUtil.readText(directory.getChild("summary").getChild("models.json"));
+        if (modelsSummaryIndex == null) {
+            try (var dir = directory.getChild("summary")) {
+                modelsSummaryIndex = getTextFileContent(dir, "models.json");
+            }
+            IoUtil.close(directory);
+        }
         return modelsSummaryIndex;
     }
 
-    public FileContent getModelSummaryImage(String id) throws FileSystemException {
-        return directory.getChild("summary").getChild(id+".png").getContent();
+    public FileObject getModelSummaryImage(String id) throws FileSystemException {
+        FileObject result;
+        try (var dir = directory.getChild("summary")) {
+            result = dir.getChild(id + ".png");
+        }
+        IoUtil.close(directory);
+        return result;
     }
 
-    public FileContent getPredictionImage() throws FileSystemException {
-        return directory.getChild("visualize.svg").getContent();
+    public FileObject getPredictionImage() throws FileSystemException {
+        FileObject result = directory.getChild("visualize.svg");
+        IoUtil.close(directory);
+        return result;
     }
 
     public String getConfigFile() throws IOException {
-        return FileObjectUtils.getContentAsString(directory.getChild("config.py"), StandardCharsets.UTF_8);
+        String result;
+        try (var file = directory.getChild("config.py")) {
+            result = FileObjectUtils.getContentAsString(file, StandardCharsets.UTF_8);
+        }
+        IoUtil.close(directory);
+        return result;
     }
 }

@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.util.FileObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,12 +34,9 @@ public class IoUtil {
 
     public static Map<String, Object> readJson(FileObject file) {
         try {
-            var content = file.getContent();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> ret = new ObjectMapper().readValue(
-                    new InputStreamReader(content.getInputStream()), Map.class);
-            content.close();
-            return ret;
+            //noinspection unchecked
+            return new ObjectMapper().readValue(new InputStreamReader(
+                    file.getContent().getInputStream()), Map.class);
         } catch (IOException e) {
             logger.warn("Cannot read json from FileObject", e);
             return null;
@@ -51,6 +49,14 @@ public class IoUtil {
         } catch (IOException e) {
             logger.warn("Cannot read text from FileObject", e);
             return null;
+        }
+    }
+
+    public static void close(FileObject fileObject) {
+        try {
+            fileObject.close();
+        } catch (FileSystemException e) {
+            logger.info("Error closing FileObject", e);
         }
     }
 }
