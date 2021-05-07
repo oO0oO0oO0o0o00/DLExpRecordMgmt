@@ -5,6 +5,8 @@ import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.util.FileObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -19,6 +21,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ExperimentRecord implements Serializable {
+
+    private final Logger logger = LogManager.getLogger(this);
 
     private final FileObject directory;
 
@@ -69,10 +73,9 @@ public class ExperimentRecord implements Serializable {
         }
     }
 
-    @NotNull
     private Map<String, Object> getJsonFileAsMap(String s) throws FileSystemException {
         try (var file = directory.getChild(s)) {
-            return Objects.requireNonNull(IoUtil.readJson(file));
+            return IoUtil.readJson(file);
         }
     }
 
@@ -133,5 +136,24 @@ public class ExperimentRecord implements Serializable {
         }
         IoUtil.close(directory);
         return result;
+    }
+
+    public boolean hasWeights() {
+        try (var dir = directory.getChild("weights")) {
+            return dir != null && dir.isFolder();
+        } catch (FileSystemException e) {
+            logger.warn("cannot determine hasWeights");
+            return false;
+        }
+    }
+
+    public boolean deleteWeights() {
+        try (var dir = directory.getChild("weights")) {
+            dir.deleteAll();
+        } catch (FileSystemException e) {
+            logger.warn("cannot get weights folder to delete");
+            return false;
+        }
+        return true;
     }
 }

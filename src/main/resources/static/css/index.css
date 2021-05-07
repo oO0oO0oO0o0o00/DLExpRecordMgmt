@@ -145,3 +145,7 @@ h5 > a, h5 > a:hover, h5 > a:visited {
 .result-card-row .caption {
     min-width: 60%;
 }
+
+.toast {
+    flex-basis: auto;
+}

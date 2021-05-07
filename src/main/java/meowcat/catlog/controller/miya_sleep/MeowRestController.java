@@ -11,6 +11,8 @@ import org.springframework.web.servlet.resource.HttpResource;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController("miya-sleep-rest-controller")
 @RequestMapping(value = "/api/miya-sleep")
@@ -46,5 +48,13 @@ public class MeowRestController {
             response.setContentType("image/svg+xml");
             img.getContent().getInputStream().transferTo(response.getOutputStream());
         }
+    }
+
+    @RequestMapping("delete-weights/{record}")
+    public Map<String, Object> deleteWeights(
+            @PathVariable("record") String recordId, HttpServletResponse response) throws IOException {
+        var result = new HashMap<String,Object>();
+        result.put("status", meowService.getRecord(recordId).deleteWeights());
+        return result;
     }
 }

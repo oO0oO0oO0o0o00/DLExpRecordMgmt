@@ -37,8 +37,10 @@ public class IoUtil {
             //noinspection unchecked
             return new ObjectMapper().readValue(new InputStreamReader(
                     file.getContent().getInputStream()), Map.class);
-        } catch (IOException e) {
-            logger.warn("Cannot read json from FileObject", e);
+        } catch (IOException | NullPointerException e) {
+            String logging_text = "Cannot read json from FileObject";
+            logger.warn("{}: {}", logging_text, e.getClass().getName());
+            logger.debug(logging_text, e);
             return null;
         }
     }
@@ -46,8 +48,10 @@ public class IoUtil {
     public static String readText(FileObject file) {
         try {
             return FileObjectUtils.getContentAsString(file, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            logger.warn("Cannot read text from FileObject", e);
+        } catch (IOException | NullPointerException e) {
+            String logging_text = "Cannot read text from FileObject";
+            logger.warn("{}: {}", logging_text, e.getClass().getName());
+            logger.debug(logging_text, e);
             return null;
         }
     }

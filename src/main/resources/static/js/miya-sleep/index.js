@@ -5,14 +5,12 @@ function capitalizeFirstChar(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-
 function displayTrainingChartOfMetric(name, train, valid) {
     let $chartWrapper = $('#training-charts-template-wrapper .chart-wrapper').clone();
     $('#training-charts-host').append($chartWrapper);
     $chartWrapper.find('.chart-title').text(name.split('_')
         .map(capitalizeFirstChar).join(' '));
 
-    name = name.replace('_', ' ');
     let data = {
         type: 'line',
         data: {
@@ -34,7 +32,8 @@ function displayTrainingChartOfMetric(name, train, valid) {
             responsive: true,
         }
     };
-    let chart = new Chart($chartWrapper.find('canvas')[0].getContext('2d'), data);
+    // noinspection JSValidateTypes
+    new Chart($chartWrapper.find('canvas')[0].getContext('2d'), data);
 }
 
 function displayTrainingCharts(data) {
@@ -48,7 +47,7 @@ function loadDetailsPageTrainingCharts($pageElement) {
     $.ajax({
         url: $pageElement.attr('href'),
         dataType: 'json',
-        success(data, status, xhr) {
+        success(data) {
             displayTrainingCharts(data);
         }
     })
@@ -70,7 +69,7 @@ function loadDetailsPageModels($pageElement) {
     $.ajax({
         url: url,
         dataType: 'json',
-        success(data, status, xhr) {
+        success(data) {
             displayModelsSummary(url, data);
         }
     })
@@ -105,6 +104,51 @@ function loadDetailsPage(tab) {
     }
 }
 
+function simpleToast(text, config) {
+    let $toast = $('#toast-template-wrapper .toast.simple-toast').clone();
+    $toast.find('.toast-body').text(text);
+    addToast($toast, config);
+}
+
+function addToast($toast, config) {
+    $('#toast-host').append($toast);
+    if (config) $toast.toast(config);
+    $toast.toast('show');
+    $toast.on('hidden.bs.toast.auto-remove', e => $(e.currentTarget).remove());
+}
+
+function requestDeleteWeights(element) {
+    let $toast = $('#toast-template-wrapper .toast.deletion-toast').clone();
+    addToast($toast);
+    $toast.attr('href', element.getAttribute('href'));
+    $toast.on('hide.bs.toast', performDeleteWeights);
+}
+
+function performDeleteWeights(event) {
+    if (event.currentTarget.hasAttribute("cancelled")) return;
+    let href = event.currentTarget.getAttribute('href');
+    let toastFailure = () => simpleToast("Deletion may have failed", {delay: 2000});
+    $.ajax({
+        url: href,
+        method: 'POST',
+        dataType: 'json',
+        success(data, status) {
+            if (status === 'success' && data.status === true) {
+                simpleToast("Deleted");
+                $('#delete-weights-area').addClass('d-none');
+            } else toastFailure();
+        }, error: toastFailure
+    })
+}
+
+function cancelDeleteWeights(element) {
+    while (!element.classList.contains("toast")) element = element.parentElement;
+    if (element.hasAttribute("cancelled")) return;
+    element.setAttribute("cancelled", "yes");
+    simpleToast("Cancelled.");
+    $(element).toast('hide');
+}
+
 $(document).ready(e => {
     // search bar
     let $sb = $('#top-search-bar-input');
@@ -113,7 +157,7 @@ $(document).ready(e => {
 
     // summary panel -> progress -> help
     $('#error-time-too-old').attr('title',
-        'The experiment han\'t updated its progress for more than 10 minutes and is likely failed. ' +
+        'The experiment hasn\'t updated its progress for more than 10 minutes and is likely failed. ' +
         'Difference in time and time zone settings between the host of this platform and the ' +
         'host where the experiments run on may also cause the problem.')
     $('#error-time-too-young').attr('title',
@@ -123,7 +167,7 @@ $(document).ready(e => {
     $('[data-toggle="tooltip"]').tooltip()
 
     // detail panels -> handle loading && load default (first) page
-    $('#nav-detail-panels .nav-item').on('show.bs.tab', function (e) {
+    $('#nav-detail-panels .nav-item').on('show.bs.tab', function () {
         loadDetailsPage($(this));
     })
     loadDetailsPage($('#nav-detail-panels .nav-item.active'))

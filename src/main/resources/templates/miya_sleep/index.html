@@ -118,6 +118,14 @@
                     </div>
                 </div>
             </div>
+            <div class="row" id="delete-weights-area" th:if="${selected_record.hasWeights()}">
+                <div class="col-9 col-md-6 col-lg-3">The model has saved weights.</div>
+                <div class="col">
+                    <button class="btn btn-outline-primary" onclick="requestDeleteWeights(this)"
+                            th:href="@{/api/miya-sleep/delete-weights/{id}(id=${selected_record.folderName})}">Delete
+                    </button>
+                </div>
+            </div>
             <div class="row p-2">
                 <div class="font-weight-bold col-12">Introduction</div>
             </div>
@@ -125,7 +133,7 @@
                 <!--suppress ThymeleafVariablesResolveInspection -->
                 <pre class="col-12" th:text="${selected_record.summary.config_intro}"></pre>
             </div>
-            <div class="row">
+            <div class="row" th:if="${selected_record.scores != null}">
                 <div class="col-sm-12 col-md-6 col-lg-3 d-flex flex-row"
                      th:each="pair: ${selected_record.scores}">
                     <div class="font-weight-bold p-2"
@@ -136,24 +144,24 @@
             </div>
             <nav id="nav-detail-panels" class="nav nav-pills nav-justified" role="tablist">
                 <div class="btn btn-link nav-link nav-item nav-cat active not-loaded" id="nav-details-training-tab"
-                        data-bs-toggle="tab" data-bs-target="#nav-details-training" role="tab"
-                        aria-controls="nav-details-training" aria-selected="true"
-                        data-href="training-curves"><span>Training</span>
+                     data-bs-toggle="tab" data-bs-target="#nav-details-training" role="tab"
+                     aria-controls="nav-details-training" aria-selected="true"
+                     data-href="training-curves"><span>Training</span>
                 </div>
                 <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-models-tab"
-                        data-bs-toggle="tab" data-bs-target="#nav-details-models" role="tab"
-                        aria-controls="nav-details-models" aria-selected="true"
-                        data-href="models-structures"><span>Models</span>
+                     data-bs-toggle="tab" data-bs-target="#nav-details-models" role="tab"
+                     aria-controls="nav-details-models" aria-selected="true"
+                     data-href="models-structures"><span>Models</span>
                 </div>
                 <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-prediction-tab"
-                        data-bs-toggle="tab" data-bs-target="#nav-details-prediction" role="tab"
-                        aria-controls="nav-details-prediction not-loaded" aria-selected="true"
-                        data-href="prediction-visualize"><span>Prediction</span>
+                     data-bs-toggle="tab" data-bs-target="#nav-details-prediction" role="tab"
+                     aria-controls="nav-details-prediction not-loaded" aria-selected="true"
+                     data-href="prediction-visualize"><span>Prediction</span>
                 </div>
                 <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-config-tab"
-                        data-bs-toggle="tab" data-bs-target="#nav-details-config" role="tab"
-                        aria-controls="nav-details-config" aria-selected="true"
-                        data-href="config-file"><span>Config</span>
+                     data-bs-toggle="tab" data-bs-target="#nav-details-config" role="tab"
+                     aria-controls="nav-details-config" aria-selected="true"
+                     data-href="config-file"><span>Config</span>
                 </div>
             </nav>
             <div class="tab-content">
@@ -193,14 +201,21 @@
             <th:block th:unless="${selected_record ne null}">
             <div class="flex-cards-md"></div>
             <div class="align-content-center">not done yet, use left bar instead</div>
+            </th:block>
             <div id="toast-host" class="position-fixed w-100 d-flex flex-column p-4" style="bottom:0">
             </div>
-            <div id="toast-template-wrapper" style="display: none">
-                <div class="toast" role="alert" data-delay="700">
+            <div id="toast-template-wrapper" class="d-none">
+                <div class="toast simple-toast" aria-live="assertive" aria-atomic="true" role="alert" data-bs-delay="1000">
                     <div class="toast-body"></div>
                 </div>
+                <div class="toast deletion-toast align-items-center" aria-live="assertive" aria-atomic="true" role="alert"
+                     data-bs-delay="2000">
+                    <div class="d-flex">
+                        <div class="toast-body">Deleting soon...</div>
+                        <button class="btn btn-link ml-auto mr-3" onclick="cancelDeleteWeights(this)">Cancel</button>
+                    </div>
+                </div>
             </div>
-            </th:block>
         </main>
     </div>
 </div>
