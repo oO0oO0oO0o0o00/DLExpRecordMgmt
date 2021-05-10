@@ -26,6 +26,8 @@ public class ExperimentRecord implements Serializable {
 
     private final FileObject directory;
 
+    private String hostName;
+
     private Map<String, Object> summary;
 
     private Map<String, Object> scores;
@@ -155,5 +157,13 @@ public class ExperimentRecord implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 }
