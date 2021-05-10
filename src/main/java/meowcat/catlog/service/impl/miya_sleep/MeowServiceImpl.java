@@ -22,8 +22,8 @@ public class MeowServiceImpl implements MeowService {
 
     private static final String[] RESULTS_PATHS = {
             "sftp://omnisky:linux123@172.21.7.117/SLEEP-DATA/maomao/results",
-            "file://home/omnisky/wzy/miya-sleep/results"
-//            "sftp://omnisky:linux123@172.21.7.125/wzy/miya-sleep/results"
+//            "file://home/omnisky/wzy/miya-sleep/results"
+            "sftp://omnisky:linux123@172.21.7.125/wzy/miya-sleep/results"
     };
 
     private static final String[] RESULTS_HOST_NAMES = {

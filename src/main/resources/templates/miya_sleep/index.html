@@ -61,11 +61,11 @@
                             <polyline points="13 2 13 9 20 9"></polyline>
                         </svg>
                         <!--suppress ThymeleafVariablesResolveInspection -->
-                        <small th:text="${some_record.summary.start_time}"></small>
+                        <small th:text="${some_record.summary?.start_time}"></small>
                         <br/>
                         <small th:text="${some_record.hostName}+':'"></small>
                         <!--suppress ThymeleafVariablesResolveInspection -->
-                        <small th:text="${some_record.summary.config_name}"></small>
+                        <small th:text="${some_record.summary?.config_name}"></small>
                         <span class="sr-only"
                               th:if="${some_record.folderName eq selected_record?.folderName}">
                             (current)</span>
