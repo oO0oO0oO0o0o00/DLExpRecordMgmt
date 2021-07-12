@@ -50,7 +50,7 @@ public class MeowController {
     public ModelAndView getLogViewer(
             @PathVariable("record-id") String recordId) throws IOException {
         ModelAndView mv = new ModelAndView("meow_floorcreep/log_viewer");
-        mv.addObject("code", meowService.getRecord(recordId).getConfigFile());
+        mv.addObject("code", meowService.getRecord(recordId).getLogFile());
         return mv;
     }
 }

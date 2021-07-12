@@ -20,7 +20,7 @@
     </script>
     <script th:if="${null ne selected_record}">
         var page = null;
-        var max_page = [[${selected_record.scores.size()}]];
+        var max_page = [[${selected_record.scores.size()}]]-1;
     </script>
 </head>
 <body>
@@ -160,7 +160,7 @@
                             <span class="digits" data-value=""></span>
                         </td>
                         <td th:each="ith_scores, stat: ${selected_record.scores}">
-                            <span class="digits" th:data-value="${ith_scores.get(metric)}"></span>
+                            <span class="digits" th:data-value="${ith_scores.get(0).get(metric)}"></span>
                         </td>
                     </tr>
                     </tbody>
@@ -185,7 +185,7 @@
                      data-href="models-structures"><span>Models</span>
                 </div>
                 <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-log-tab"
-                     data-bs-toggle="tab" data-bs-target="#nav-details-prediction" role="tab"
+                     data-bs-toggle="tab" data-bs-target="#nav-details-log" role="tab"
                      aria-controls="nav-details-log not-loaded" aria-selected="true"
                      data-href="log-file"><span>Log</span>
                 </div>
@@ -207,7 +207,7 @@
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <li th:each="i: ${#numbers.sequence(1, selected_record.scores.size())}"
+                            <li th:each="i: ${#numbers.sequence(1, selected_record.scores.size()-1)}"
                                 class="page-item page-number" th:attr="page-number=${i}"
                                 th:attrappend="aria-current=${i eq 1}?'page'">
                                 <a class="page-link" href="javascript:void(0)" th:onclick="|setDetailsPageTrainingChartsPage(${i})|">

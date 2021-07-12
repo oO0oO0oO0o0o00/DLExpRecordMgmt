@@ -1,13 +1,10 @@
 package meowcat.catlog.model.meow_floorcreep;
 
-import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import meowcat.catlog.util.IoUtil;
-import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.util.FileObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,10 +15,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ExperimentRecord implements Serializable {
@@ -32,7 +26,7 @@ public class ExperimentRecord implements Serializable {
 
     private Map<String, Object> summary;
 
-    private List<Map<String, Object>> scores;
+    private List<List<Map<String, Object>>> scores;
 
     private List<String> metrics;
 
@@ -55,45 +49,26 @@ public class ExperimentRecord implements Serializable {
         return summary;
     }
 
-    public List<Map<String, Object>> getScores() throws FileSystemException {
+    public List<List<Map<String, Object>>> getScores() throws FileSystemException {
         if (scores == null) {
-            try (var resultsPath = directory.getChild("results")) {
-                try (var cachePath = resultsPath.getChild("scores.cache.json")) {
-                    if (cachePath != null) {
-                        scores = IoUtil.readJsonArray(cachePath);
-                        assert scores != null;
-                    }
-                }
-            }
-        }
-        if (scores == null) {
-            var numFold = getNumFold();
-            scores = new ArrayList<>(numFold);
-            for (var i = 0; i < numFold; i++) scores.add(null);
-            for (var item : getExistingFolds().entrySet()) {
-                try (var file = item.getValue().getChild("scores.json")) {
-                    var json = IoUtil.readJsonArray(file);
-                    assert json != null;
-                    scores.set(item.getKey(), json.get(0));
-                }
-            }
-
-            if ((boolean) getProgress().get("completed")) {
-                try (var cachePath = directory.resolveFile("results/scores.cache.json")) {
-                    cachePath.createFile();
-                    try (var content = cachePath.getContent()) {
-                        try (var os = content.getOutputStream()) {
-                            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-                                    .writeValue(os, scores);
-                        } catch (IOException e) {
-                            logger.error(e);
-                        }
-                    }
-                }
+            try (var resultsPath = directory.getChild("results.json")) {
+                var results = IoUtil.readJson(resultsPath);
+                assert results != null;
+                @SuppressWarnings("unchecked")
+                var rawScores = (List<Object>) results.get("test_scores");
+                //noinspection unchecked
+                scores = rawScores.stream().map(o -> (
+                        Objects.requireNonNull((o instanceof List) ? (List<Object>) o : null))
+                        .stream().map(oo -> (oo instanceof Map) ?
+                                (Map<String, Object>) oo : null)
+                        .collect(Collectors.toList())).collect(Collectors.toList());
             }
             IoUtil.close(directory);
+            List<Map<String, Object>> first;
+            if (metrics == null && scores != null && scores.size() > 0
+                    && (first = scores.get(0)).size() > 0)
+                metrics = new ArrayList<>(first.get(0).keySet());
         }
-        if (metrics == null && scores.size() > 0) metrics = new ArrayList<>(scores.get(0).keySet());
         return scores;
     }
 
@@ -102,15 +77,13 @@ public class ExperimentRecord implements Serializable {
         return metrics;
     }
 
-    public String getHistory(int ithFold) throws FileSystemException {
-        try (var resultsPath = directory.getChild("results")) {
-            try (var ithFoldPath = resultsPath.getChild(String.format("%02d", ithFold))) {
-                try (var file = ithFoldPath.getChild("history.json")) {
-                    var ret = IoUtil.readText(file);
-                    IoUtil.close(directory);
-                    return ret;
-                }
-            }
+    public String getHistory(int ithFold) throws FileSystemException, JsonProcessingException {
+        try (var resultsPath = directory.getChild("results.json")) {
+            var results = IoUtil.readJson(resultsPath);
+            assert results != null;
+            @SuppressWarnings("unchecked")
+            var histories = (List<Object>)results.get("training_history");
+            return new ObjectMapper().writeValueAsString(histories.get(ithFold));
         }
     }
 
@@ -142,7 +115,11 @@ public class ExperimentRecord implements Serializable {
     public String getModelsSummaryIndex() throws FileSystemException {
         if (modelsSummaryIndex == null) {
             try (var dir = directory.getChild("models")) {
-                modelsSummaryIndex = getTextFileContent(dir, "models.json");
+                String result;
+                try (var file = dir.getChild("models.json")) {
+                    result = IoUtil.readText(file);
+                }
+                modelsSummaryIndex = result;
             }
             IoUtil.close(directory);
         }
@@ -201,32 +178,6 @@ public class ExperimentRecord implements Serializable {
 
     public String getHostName() {
         return hostName;
-    }
-
-    private Map<Integer, FileObject> getExistingFolds() throws FileSystemException {
-        int numFold = getNumFold();
-        Map<Integer, FileObject> existingFolds = new HashMap<>(numFold);
-        try (var resultsPath = directory.getChild("results")) {
-            for (var fold : resultsPath.getChildren()) {
-                try {
-                    int ithFold = Integer.parseInt(fold.getName().getBaseName());
-                    if (ithFold >= 0 && ithFold < numFold)
-                        existingFolds.put(ithFold, fold);
-                } catch (NumberFormatException ignored) {
-                }
-            }
-        }
-        return existingFolds;
-    }
-
-    private int getNumFold() throws FileSystemException {
-        return (int) getSummary().get("num_fold");
-    }
-
-    private static String getTextFileContent(FileObject directory, String s) throws FileSystemException {
-        try (var file = directory.getChild(s)) {
-            return IoUtil.readText(file);
-        }
     }
 
     private Map<String, Object> getJsonFileAsMap(String s) throws FileSystemException {

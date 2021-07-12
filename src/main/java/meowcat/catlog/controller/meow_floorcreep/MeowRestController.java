@@ -1,5 +1,6 @@
 package meowcat.catlog.controller.meow_floorcreep;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import meowcat.catlog.service.meow_floorcreep.MeowService;
 import org.apache.commons.vfs2.FileSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class MeowRestController {
 
     @RequestMapping("history/{record}/{ith_fold}")
     public String getHistory(@PathVariable("record") String id,
-                             @PathVariable("ith_fold") int ithFold) throws FileSystemException {
+                             @PathVariable("ith_fold") int ithFold) throws FileSystemException, JsonProcessingException {
         return meowService.getRecord(id).getHistory(ithFold);
     }
 

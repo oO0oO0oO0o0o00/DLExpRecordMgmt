@@ -44,8 +44,9 @@ public class IoUtil {
     }
 
 
-    public static List<Map<String, Object>> readJsonArray(FileObject file) {
+    public static List<Object> readJsonArray(FileObject file) {
         try {
+            //noinspection unchecked
             return new ObjectMapper().readValue(new InputStreamReader(
                     file.getContent().getInputStream()), List.class);
         } catch (IOException | NullPointerException e) {
