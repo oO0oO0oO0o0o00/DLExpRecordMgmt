@@ -1,0 +1,6 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <link rel="stylesheet" th:href="@{/highlightjs/styles/default.css}"/>
+    <script th:src="@{/highlightjs/highlight.pack.js}"></script>
+    <script>hljs.highlightAll();</script>
+    <pre><code class="no-highlight" th:text="${code}"></code></pre>
+</div>

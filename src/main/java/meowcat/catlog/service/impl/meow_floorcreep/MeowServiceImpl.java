@@ -1,8 +1,8 @@
-package meowcat.catlog.service.impl.miya_sleep;
+package meowcat.catlog.service.impl.meow_floorcreep;
 
 import meowcat.catlog.config.VFSOptions;
-import meowcat.catlog.model.miya_sleep.ExperimentRecord;
-import meowcat.catlog.service.miya_sleep.MeowService;
+import meowcat.catlog.model.meow_floorcreep.ExperimentRecord;
+import meowcat.catlog.service.meow_floorcreep.MeowService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.vfs2.FileObject;
@@ -13,22 +13,24 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service("miya-sleep-MeowService")
+@Service("meow-floorcreep-MeowService")
 public class MeowServiceImpl implements MeowService {
 
     private static final String[] RESULTS_PATHS = {
-            "sftp://omnisky:linux123@172.21.7.117/SLEEP-DATA/maomao/results",
-            "sftp://omnisky:linux123@172.21.7.160/wzy/miya-sleep/results",
-            "file://home/omnisky/wzy/miya-sleep/results"
-//            "sftp://omnisky:linux123@172.21.7.125/wzy/miya-sleep/results"
+//            "sftp://omnisky:linux123@localhost:10223/SLEEP-DATA/maomao/results",
+            "sftp://omnisky:linux123@localhost:10221/wzy/meow-floorcreep/experiments",
+//            "sftp://omnisky:linux123@localhost:10222/wzy/miya-sleep/results"
     };
 
     private static final String[] RESULTS_HOST_NAMES = {
-            "117", "160", "125"
+            /*"117", */"160"/*, "125"*/
     };
     public static final String ERR_STRING_CANNOT_GET_RESULTS_OF_DIR = "Cannot get experiment records list of result directory.";
 
