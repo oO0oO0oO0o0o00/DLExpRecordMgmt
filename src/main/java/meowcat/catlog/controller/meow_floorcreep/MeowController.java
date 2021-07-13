@@ -2,6 +2,8 @@ package meowcat.catlog.controller.meow_floorcreep;
 
 import meowcat.catlog.model.meow_floorcreep.ExperimentRecord;
 import meowcat.catlog.service.meow_floorcreep.MeowService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,20 +23,31 @@ public class MeowController {
     @Autowired
     private MeowService meowService;
 
+    private final Logger logger = LogManager.getLogger(this);
+
     @RequestMapping
     public ModelAndView request(
             @RequestParam(value = "selected-record", required = false) String selectedRecordName) {
         ModelAndView mv = new ModelAndView("meow_floorcreep/index");
-        List<ExperimentRecord> allRecords = meowService.getRecords();
+        List<ExperimentRecord> allRecords = null;
+        try {
+            allRecords=meowService.getRecords();
+        }catch (Exception e){
+            logger.warn("cannot get records",e);
+        }
         if (allRecords == null) {
             mv.addObject("failed", true);
             return mv;
         }
         mv.addObject("all_records", allRecords);
         if (selectedRecordName != null)
-            mv.addObject("selected_record", allRecords.stream()
-                    .filter(experimentRecord -> Objects.equals(selectedRecordName, experimentRecord.getFolderName()))
-                    .findAny().orElse(allRecords.size() > 0 ? allRecords.get(0) : null));
+            try {
+                mv.addObject("selected_record", allRecords.stream()
+                        .filter(experimentRecord -> Objects.equals(selectedRecordName, experimentRecord.getFolderName()))
+                        .findAny().orElse(allRecords.size() > 0 ? allRecords.get(0) : null));
+            }catch (Exception e){
+                logger.warn("cannot find selected record",e);
+            }
         return mv;
     }
 

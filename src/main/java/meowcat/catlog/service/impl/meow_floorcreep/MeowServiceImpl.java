@@ -27,6 +27,7 @@ public class MeowServiceImpl implements MeowService {
 //            "sftp://omnisky:linux123@localhost:10223/SLEEP-DATA/maomao/results",
             "sftp://omnisky:linux123@localhost:10221/wzy/meow-floorcreep/experiments",
 //            "sftp://omnisky:linux123@localhost:10222/wzy/miya-sleep/results"
+//            "sftp://omnisky:linux123@s160/wzy/meow-floorcreep/experiments",
     };
 
     private static final String[] RESULTS_HOST_NAMES = {

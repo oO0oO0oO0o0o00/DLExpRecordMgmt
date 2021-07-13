@@ -41,33 +41,43 @@ public class ExperimentRecord implements Serializable {
         this.directory = directory;
     }
 
-    public Map<String, Object> getSummary() throws FileSystemException {
+    public Map<String, Object> getSummary() {
         if (summary == null) {
-            summary = getJsonFileAsMap("summary.json");
+            try {
+                summary = getJsonFileAsMap("summary.json");
+            } catch (FileSystemException e) {
+                logger.info("FileSystemException");
+            }
             IoUtil.close(directory);
         }
         return summary;
     }
 
-    public List<List<Map<String, Object>>> getScores() throws FileSystemException {
+    public List<List<Map<String, Object>>> getScores() {
         if (scores == null) {
-            try (var resultsPath = directory.getChild("results.json")) {
-                var results = IoUtil.readJson(resultsPath);
-                assert results != null;
-                @SuppressWarnings("unchecked")
-                var rawScores = (List<Object>) results.get("test_scores");
-                //noinspection unchecked
-                scores = rawScores.stream().map(o -> (
-                        Objects.requireNonNull((o instanceof List) ? (List<Object>) o : null))
-                        .stream().map(oo -> (oo instanceof Map) ?
-                                (Map<String, Object>) oo : null)
-                        .collect(Collectors.toList())).collect(Collectors.toList());
+            try {
+                try (var resultsPath = directory.getChild("results.json")) {
+                    var results = IoUtil.readJson(resultsPath);
+                    assert results != null;
+                    @SuppressWarnings("unchecked")
+                    var rawScores = (List<Object>) results.get("test_scores");
+                    //noinspection unchecked
+                    scores = rawScores.stream().map(o -> (
+                            Objects.requireNonNull((o instanceof List) ? (List<Object>) o : null))
+                            .stream().map(oo -> (oo instanceof Map) ?
+                                    (Map<String, Object>) oo : null)
+                            .collect(Collectors.toList())).collect(Collectors.toList());
+                }
+                IoUtil.close(directory);
+                List<Map<String, Object>> first;
+                if (metrics == null && scores != null && scores.size() > 0
+                        && (first = scores.get(0)).size() > 0)
+                    metrics = new ArrayList<>(first.get(0).keySet());
+            } catch (FileSystemException fse) {
+                logger.info("FileSystemException");
+            } catch (Exception e) {
+                logger.warn("cannot get scores", e);
             }
-            IoUtil.close(directory);
-            List<Map<String, Object>> first;
-            if (metrics == null && scores != null && scores.size() > 0
-                    && (first = scores.get(0)).size() > 0)
-                metrics = new ArrayList<>(first.get(0).keySet());
         }
         return scores;
     }
@@ -77,13 +87,18 @@ public class ExperimentRecord implements Serializable {
         return metrics;
     }
 
-    public String getHistory(int ithFold) throws FileSystemException, JsonProcessingException {
-        try (var resultsPath = directory.getChild("results.json")) {
-            var results = IoUtil.readJson(resultsPath);
-            assert results != null;
-            @SuppressWarnings("unchecked")
-            var histories = (List<Object>)results.get("training_history");
-            return new ObjectMapper().writeValueAsString(histories.get(ithFold));
+    public String getHistory(int ithFold) {
+        try {
+            try (var resultsPath = directory.getChild("results.json")) {
+                var results = IoUtil.readJson(resultsPath);
+                assert results != null;
+                @SuppressWarnings("unchecked")
+                var histories = (List<Object>) results.get("training_history");
+                return new ObjectMapper().writeValueAsString(histories.get(ithFold));
+            }
+        } catch (Exception e) {
+            logger.warn("cannot get history of fold " + ithFold, e);
+            return null;
         }
     }
 

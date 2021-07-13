@@ -20,7 +20,7 @@
     </script>
     <script th:if="${null ne selected_record}">
         var page = null;
-        var max_page = [[${selected_record.scores.size()}]]-1;
+        var max_page = [[${selected_record.scores?.size()?:1}]]-1;
     </script>
 </head>
 <body>
