@@ -47,7 +47,8 @@ function displayTrainingCharts(data) {
 function loadDetailsPageTrainingCharts($pageElement, ithFold) {
     if (!$pageElement) $pageElement = $("#nav-details-training");
     $.ajax({
-        url: $pageElement.attr('href') + "/" + ithFold,
+        url: $pageElement.attr('href'),
+        data: {"ith-fold": ithFold},
         dataType: 'json',
         success(data) {
             displayTrainingCharts(data);
@@ -144,12 +145,14 @@ function displayModelsSummary(url, data) {
 }
 
 function loadDetailsPageModels($pageElement) {
-    let url = $pageElement.attr('href');
+    let url = $('#nav-details-models').attr('href');
+    let baseUrl = new URL(url, location);
+    baseUrl = new URL(baseUrl.searchParams.get("record-id"), baseUrl);
     $.ajax({
         url: url,
         dataType: 'json',
         success(data) {
-            displayModelsSummary(url, data);
+            displayModelsSummary(baseUrl, data);
         }
     })
 }
@@ -203,6 +206,22 @@ function requestDeleteWeights(element) {
     addToast($toast);
     $toast.attr('href', element.getAttribute('href'));
     $toast.on('hide.bs.toast', performDeleteWeights);
+}
+
+function requestDelete(element) {
+    if (confirm("???")) {
+        let toastFailure = () => simpleToast("Deletion may have failed", {delay: 2000});
+        $.ajax({
+            url: element.getAttribute('href'),
+            method: 'POST',
+            dataType: 'json',
+            success(data, status) {
+                if (data.status === true && status === 'success') {
+                    simpleToast("Deleted");
+                } else toastFailure();
+            }, error: toastFailure
+        })
+    }
 }
 
 function performDeleteWeights(event) {
@@ -267,7 +286,7 @@ $(document).ready(e => {
                         .filter(e => !isNaN(e))
                     let mean = values.reduce((a, b) => a + b, 0.0) / values.length;
                     let std = Math.sqrt(values.map(e => e - mean).map(e => e * e)
-                        .reduce((a, b) => a + b, 0.0)/values.length);
+                        .reduce((a, b) => a + b, 0.0) / values.length);
                     // console.log("" + mean + "+" + std);
                     let $meanAndStd = $row.find('td:first-of-type .digits');
                     $($meanAndStd[0]).attr('data-value', "" + mean);

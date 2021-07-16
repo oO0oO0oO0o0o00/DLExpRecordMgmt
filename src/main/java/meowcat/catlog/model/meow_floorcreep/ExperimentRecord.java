@@ -1,6 +1,5 @@
 package meowcat.catlog.model.meow_floorcreep;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import meowcat.catlog.util.IoUtil;
 import org.apache.commons.vfs2.FileObject;
@@ -26,7 +25,7 @@ public class ExperimentRecord implements Serializable {
 
     private Map<String, Object> summary;
 
-    private List<List<Map<String, Object>>> scores;
+    private List<Map<String, Object>> scores;
 
     private List<String> metrics;
 
@@ -53,26 +52,21 @@ public class ExperimentRecord implements Serializable {
         return summary;
     }
 
-    public List<List<Map<String, Object>>> getScores() {
+    public List<Map<String, Object>> getScores() {
         if (scores == null) {
             try {
                 try (var resultsPath = directory.getChild("results.json")) {
+                    if (resultsPath == null) return null;
                     var results = IoUtil.readJson(resultsPath);
                     assert results != null;
                     @SuppressWarnings("unchecked")
                     var rawScores = (List<Object>) results.get("test_scores");
                     //noinspection unchecked
-                    scores = rawScores.stream().map(o -> (
-                            Objects.requireNonNull((o instanceof List) ? (List<Object>) o : null))
-                            .stream().map(oo -> (oo instanceof Map) ?
-                                    (Map<String, Object>) oo : null)
-                            .collect(Collectors.toList())).collect(Collectors.toList());
+                    scores = rawScores.stream().map(o -> (o instanceof Map) ?
+                            (Map<String, Object>) o : null).collect(Collectors.toList());
                 }
-                IoUtil.close(directory);
-                List<Map<String, Object>> first;
-                if (metrics == null && scores != null && scores.size() > 0
-                        && (first = scores.get(0)).size() > 0)
-                    metrics = new ArrayList<>(first.get(0).keySet());
+                if (metrics == null && scores != null && scores.size() > 0)
+                    metrics = new ArrayList<>(scores.get(0).keySet());
             } catch (FileSystemException fse) {
                 logger.info("FileSystemException");
             } catch (Exception e) {
@@ -82,7 +76,7 @@ public class ExperimentRecord implements Serializable {
         return scores;
     }
 
-    public List<String> getMetrics() throws FileSystemException {
+    public List<String> getMetrics() {
         if (metrics == null) getScores();
         return metrics;
     }
@@ -90,6 +84,7 @@ public class ExperimentRecord implements Serializable {
     public String getHistory(int ithFold) {
         try {
             try (var resultsPath = directory.getChild("results.json")) {
+                if (resultsPath == null) return null;
                 var results = IoUtil.readJson(resultsPath);
                 assert results != null;
                 @SuppressWarnings("unchecked")
@@ -175,6 +170,16 @@ public class ExperimentRecord implements Serializable {
             logger.warn("cannot determine hasWeights");
             return false;
         }
+    }
+
+    public boolean delete() {
+        try {
+            directory.deleteAll();
+        } catch (FileSystemException e) {
+            logger.warn("cannot delete");
+            return false;
+        }
+        return true;
     }
 
     public boolean deleteWeights() {

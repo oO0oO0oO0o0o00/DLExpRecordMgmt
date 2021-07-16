@@ -58,7 +58,7 @@
                 <li class="nav-item" th:each="some_record: ${all_records}">
                     <a class="nav-link"
                        th:classappend="${some_record.folderName eq selected_record?.folderName} ? 'active'"
-                       th:href="@{/meow-floorcreep/(selected-record=${some_record.folderName})}">
+                       th:href="@{/meow-floorcreep/{selected}(selected=${some_record.folderName})}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -71,6 +71,8 @@
                         <small th:text="${some_record.summary?.start_time}"></small>
                         <br/>
                         <small th:text="${some_record.hostName}+':'"></small>
+                        <!--suppress ThymeleafVariablesResolveInspection -->
+                        <small th:text="${some_record.summary?.config_file}+':'"></small>
                         <!--suppress ThymeleafVariablesResolveInspection -->
                         <small th:text="${some_record.summary?.config_name}"></small>
                         <span class="sr-only"
@@ -126,11 +128,21 @@
                     </div>
                 </div>
             </div>
-            <div class="row" id="delete-weights-area" th:if="${selected_record.hasWeights()}">
-                <div class="col-9 col-md-6 col-lg-3">The model has saved weights.</div>
-                <div class="col">
+            <div class="row p-2">
+                <div class="col" id="delete-weights-area" th:if="${selected_record.hasWeights()}">
                     <button class="btn btn-outline-primary" onclick="requestDeleteWeights(this)"
-                            th:href="@{/api/meow-floorcreep/delete-weights/{id}(id=${selected_record.folderName})}">Delete
+                            th:href="@{/api/meow-floorcreep/delete-weights/(record-id=${selected_record.folderName})}">
+                        Delete Saved Weights
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="requestDeleteWeights(this)"
+                            th:href="@{/api/meow-floorcreep/delete-weights/(record-id=${selected_record.folderName})}">
+                        Keep Only Final Weights
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-outline-danger" onclick="requestDelete(this)"
+                            th:href="@{/api/meow-floorcreep/delete/(record-id=${selected_record.folderName})}">
+                        Delete This Record
                     </button>
                 </div>
             </div>
@@ -160,7 +172,7 @@
                             <span class="digits" data-value=""></span>
                         </td>
                         <td th:each="ith_scores, stat: ${selected_record.scores}">
-                            <span class="digits" th:data-value="${ith_scores.get(0).get(metric)}"></span>
+                            <span class="digits" th:data-value="${ith_scores.get(metric)}"></span>
                         </td>
                     </tr>
                     </tbody>
@@ -169,6 +181,7 @@
             <div class="row p-2">
                     <form class="form-inline ml-auto mr-md-5 pr-md-5">
                         <label for="table-digits-range">Digits: </label>
+                        <!--suppress XmlUnboundNsPrefix -->
                         <input v-model="digits" type="range" id="table-digits-range" min="2"
                                max="4" v-on:change="change"/>
                     </form>
@@ -198,8 +211,8 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active container-fluid" id="nav-details-training" role="tabpanel"
                      aria-labelledby="nav-details-training-tab"
-                     th:href="@{/api/meow-floorcreep/history/{id}(id=${selected_record.folderName})}">
-                    <nav class="details-pagination"
+                     th:href="@{/api/meow-floorcreep/history/(record-id=${selected_record.folderName})}">
+                    <nav class="details-pagination" th:if="${selected_record.scores}"
                          aria-label="Page navigation indicating which fold it is of among k-fold validation results.">
                         <ul class="pagination" id="pagination">
                             <li class="page-item disabled page-previous">
@@ -232,7 +245,7 @@
                 </div>
                 <div class="tab-pane fade show" id="nav-details-models" role="tabpanel"
                      aria-labelledby="nav-details-models-tab"
-                     th:href="@{/api/meow-floorcreep/models-summary/{id}(id=${selected_record.folderName})}">
+                     th:href="@{/api/meow-floorcreep/models-summary/(record-id=${selected_record.folderName})}">
                     <div class="row" id="models-summary-host"></div>
                     <div class="d-none" id="models-summary-template-wrapper">
                         <div class="col-12 col-lg-6">
@@ -243,11 +256,11 @@
                 </div>
                 <div class="tab-pane fade show" id="nav-details-log" role="tabpanel"
                      aria-labelledby="nav-details-log-tab"
-                     th:href="@{/meow-floorcreep/log/{id}(id=${selected_record.folderName})}">
+                     th:href="@{/meow-floorcreep/log/(record-id=${selected_record.folderName})}">
                 </div>
                 <div class="tab-pane fade show" id="nav-details-config" role="tabpanel"
                      aria-labelledby="nav-details-config-tab"
-                     th:href="@{/meow-floorcreep/config/{id}(id=${selected_record.folderName})}">
+                     th:href="@{/meow-floorcreep/config/(record-id=${selected_record.folderName})}">
                 </div>
             </div>
             </th:block>

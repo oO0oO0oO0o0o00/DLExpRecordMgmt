@@ -4,5 +4,10 @@
       "name": "meowcat.catlog.ssh.known_hosts_dir",
       "type": "java.lang.String",
       "description": "Description for meowcat.catlog.ssh.known_hosts_dir."
-  }
-] }
+    },
+    {
+      "name": "meowcat.under_port_fw",
+      "type": "java.lang.Boolean",
+      "description": "Description for meowcat.under_port_fw."
+    }
+  ] }

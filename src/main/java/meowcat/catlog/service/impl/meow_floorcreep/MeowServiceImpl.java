@@ -1,5 +1,6 @@
 package meowcat.catlog.service.impl.meow_floorcreep;
 
+import meowcat.catlog.config.ClusterConfig;
 import meowcat.catlog.config.VFSOptions;
 import meowcat.catlog.model.meow_floorcreep.ExperimentRecord;
 import meowcat.catlog.service.meow_floorcreep.MeowService;
@@ -23,12 +24,7 @@ import java.util.stream.Stream;
 @Service("meow-floorcreep-MeowService")
 public class MeowServiceImpl implements MeowService {
 
-    private static final String[] RESULTS_PATHS = {
-//            "sftp://omnisky:linux123@localhost:10223/SLEEP-DATA/maomao/results",
-            "sftp://omnisky:linux123@localhost:10221/wzy/meow-floorcreep/experiments",
-//            "sftp://omnisky:linux123@localhost:10222/wzy/miya-sleep/results"
-//            "sftp://omnisky:linux123@s160/wzy/meow-floorcreep/experiments",
-    };
+    private static final String RESULTS_PATH = "/wzy/meow-floorcreep/experiments";
 
     private static final String[] RESULTS_HOST_NAMES = {
             /*"117", */"160"/*, "125"*/
@@ -37,19 +33,26 @@ public class MeowServiceImpl implements MeowService {
 
     private final Iterable<Pair<String, FileObject>> resultsPathIterable;
 
+    private final String[] RESULTS_URLS;
+
     private final Logger logger = LogManager.getLogger(this);
 
     @Autowired
     private VFSOptions vfsOptions;
 
-    public MeowServiceImpl() {
+    @Autowired
+    public MeowServiceImpl(ClusterConfig clusterConfig) {
+
+        RESULTS_URLS = Arrays.stream(RESULTS_HOST_NAMES)
+                .map(name -> clusterConfig.getDirectoryPath(name, RESULTS_PATH)).toArray(String[]::new);
+
         this.resultsPathIterable = () -> new Iterator<>() {
 
             private int index = 0;
 
             @Override
             public boolean hasNext() {
-                return index < RESULTS_PATHS.length;
+                return index < RESULTS_HOST_NAMES.length;
             }
 
             @Override
@@ -57,7 +60,7 @@ public class MeowServiceImpl implements MeowService {
                 ImmutablePair<String, FileObject> ret;
                 try {
                     ret = new ImmutablePair<>(RESULTS_HOST_NAMES[index],
-                            VFS.getManager().resolveFile(RESULTS_PATHS[index],
+                            VFS.getManager().resolveFile(RESULTS_URLS[index],
                                     vfsOptions.getFileSystemOptions()));
                 } catch (FileSystemException e) {
                     logger.warn("Cannot get result directory as FileObject.", e);

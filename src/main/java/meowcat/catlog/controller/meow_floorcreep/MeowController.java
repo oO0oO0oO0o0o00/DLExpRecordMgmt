@@ -20,20 +20,23 @@ import java.util.Objects;
 @RequestMapping(value = "/meow-floorcreep")
 public class MeowController {
 
-    @Autowired
-    private MeowService meowService;
+    private final MeowService meowService;
 
     private final Logger logger = LogManager.getLogger(this);
 
-    @RequestMapping
+    public MeowController(MeowService meowService) {
+        this.meowService = meowService;
+    }
+
+    @GetMapping({"{selected}", ""})
     public ModelAndView request(
-            @RequestParam(value = "selected-record", required = false) String selectedRecordName) {
+            @PathVariable(value = "selected", required = false) String selectedRecordName) {
         ModelAndView mv = new ModelAndView("meow_floorcreep/index");
         List<ExperimentRecord> allRecords = null;
         try {
-            allRecords=meowService.getRecords();
-        }catch (Exception e){
-            logger.warn("cannot get records",e);
+            allRecords = meowService.getRecords();
+        } catch (Exception e) {
+            logger.warn("cannot get records", e);
         }
         if (allRecords == null) {
             mv.addObject("failed", true);
@@ -45,23 +48,23 @@ public class MeowController {
                 mv.addObject("selected_record", allRecords.stream()
                         .filter(experimentRecord -> Objects.equals(selectedRecordName, experimentRecord.getFolderName()))
                         .findAny().orElse(allRecords.size() > 0 ? allRecords.get(0) : null));
-            }catch (Exception e){
-                logger.warn("cannot find selected record",e);
+            } catch (Exception e) {
+                logger.warn("cannot find selected record", e);
             }
         return mv;
     }
 
-    @GetMapping("config/{record-id}")
+    @GetMapping("config")
     public ModelAndView getConfigViewer(
-            @PathVariable("record-id") String recordId) throws IOException {
+            @RequestParam("record-id") String recordId) throws IOException {
         ModelAndView mv = new ModelAndView("meow_floorcreep/code_viewer");
         mv.addObject("code", meowService.getRecord(recordId).getConfigFile());
         return mv;
     }
 
-    @GetMapping("log/{record-id}")
+    @GetMapping("log")
     public ModelAndView getLogViewer(
-            @PathVariable("record-id") String recordId) throws IOException {
+            @RequestParam("record-id") String recordId) throws IOException {
         ModelAndView mv = new ModelAndView("meow_floorcreep/log_viewer");
         mv.addObject("code", meowService.getRecord(recordId).getLogFile());
         return mv;

@@ -66,6 +66,9 @@
                         <small th:text="${some_record.hostName}+':'"></small>
                         <!--suppress ThymeleafVariablesResolveInspection -->
                         <small th:text="${some_record.summary?.config_name}"></small>
+                        <br/>
+                        <!--suppress ThymeleafVariablesResolveInspection -->
+                        <small th:text="${some_record.summary?.config_file}"></small>
                         <span class="sr-only"
                               th:if="${some_record.folderName eq selected_record?.folderName}">
                             (current)</span>
