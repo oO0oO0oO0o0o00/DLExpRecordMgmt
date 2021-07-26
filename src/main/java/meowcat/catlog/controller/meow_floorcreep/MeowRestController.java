@@ -24,7 +24,7 @@ public class MeowRestController {
     @RequestMapping("history")
     public String getHistory(@RequestParam("record-id") String id,
                              @RequestParam("ith-fold") int ithFold) throws FileSystemException, JsonProcessingException {
-        return meowService.getRecord(id).getHistory(ithFold);
+        return meowService.getRecord(id).getHistory(ithFold-1);
     }
 
     @RequestMapping("models-summary")

@@ -11,22 +11,27 @@ function displayTrainingChartOfMetric(name, train, valid) {
     $chartWrapper.find('.chart-title').text(name.split('_')
         .map(capitalizeFirstChar).join(' '));
 
+    let datasets = []
+    if (train) datasets.push({
+        label: "Training",
+        data: train,
+        fill: false,
+        backgroundColor: '#f00',
+        borderColor: '#f00'
+    });
+    if (valid) datasets.push({
+        label: "Validation",
+        data: valid,
+        fill: false,
+        backgroundColor: '#00f',
+        borderColor: '#00f'
+    });
+
     let data = {
         type: 'line',
         data: {
-            datasets: [{
-                label: "Training",
-                data: train,
-                fill: false,
-                backgroundColor: '#f00',
-                borderColor: '#f00'
-            }, {
-                label: "Validation",
-                data: valid,
-                fill: false,
-                backgroundColor: '#00f',
-                borderColor: '#00f'
-            }], labels: [...train.keys()]
+            datasets: datasets,
+            labels: [...train.keys()]
         },
         options: {
             responsive: true,
@@ -38,9 +43,20 @@ function displayTrainingChartOfMetric(name, train, valid) {
 
 function displayTrainingCharts(data) {
     $('#training-charts-host').html('');
+    let visited = [];
     for (let key of Object.keys(data)) {
-        if (key.startsWith('val_')) continue;
-        displayTrainingChartOfMetric(key, data[key], data[`val_${key}`])
+        if (visited.includes(key)) continue;
+        let train_metric_name, val_metric_name;
+        if (key.startsWith('val_')) {
+            train_metric_name = key.substr(key.length);
+            val_metric_name = key;
+        } else {
+            train_metric_name = key;
+            val_metric_name = "val_" + key;
+        }
+        visited.push(train_metric_name);
+        visited.push(val_metric_name);
+        displayTrainingChartOfMetric(train_metric_name, data[train_metric_name], data[val_metric_name])
     }
 }
 

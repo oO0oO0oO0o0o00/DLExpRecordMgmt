@@ -20,7 +20,7 @@
     </script>
     <script th:if="${null ne selected_record}">
         var page = null;
-        var max_page = [[${selected_record.scores?.size()?:1}]]-1;
+        var max_page = [[${selected_record.scores?.size()?:1}]];
     </script>
 </head>
 <body>
@@ -161,7 +161,7 @@
                         <th scope="col">index</th>
                         <th scope="col">Average</th>
                         <th scope="col" th:each="_, stat: ${selected_record.scores}"
-                            th:text="${stat.index}"></th>
+                            th:text="${stat.index+1}"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -220,7 +220,7 @@
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <li th:each="i: ${#numbers.sequence(1, selected_record.scores.size()-1)}"
+                            <li th:each="i: ${#numbers.sequence(1, selected_record.scores.size())}"
                                 class="page-item page-number" th:attr="page-number=${i}"
                                 th:attrappend="aria-current=${i eq 1}?'page'">
                                 <a class="page-link" href="javascript:void(0)" th:onclick="|setDetailsPageTrainingChartsPage(${i})|">
