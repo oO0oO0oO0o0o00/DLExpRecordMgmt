@@ -31,7 +31,7 @@ function displayTrainingChartOfMetric(name, train, valid) {
         type: 'line',
         data: {
             datasets: datasets,
-            labels: [...train.keys()]
+            labels: [...(train ?? valid).keys()]
         },
         options: {
             responsive: true,
@@ -44,15 +44,16 @@ function displayTrainingChartOfMetric(name, train, valid) {
 function displayTrainingCharts(data) {
     $('#training-charts-host').html('');
     let visited = [];
+    const VALIDATION_MARKER = "val_";
     for (let key of Object.keys(data)) {
         if (visited.includes(key)) continue;
         let train_metric_name, val_metric_name;
-        if (key.startsWith('val_')) {
-            train_metric_name = key.substr(key.length);
+        if (key.startsWith(VALIDATION_MARKER)) {
+            train_metric_name = key.substr(VALIDATION_MARKER.length);
             val_metric_name = key;
         } else {
             train_metric_name = key;
-            val_metric_name = "val_" + key;
+            val_metric_name = VALIDATION_MARKER + key;
         }
         visited.push(train_metric_name);
         visited.push(val_metric_name);
