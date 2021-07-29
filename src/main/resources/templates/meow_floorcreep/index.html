@@ -43,7 +43,8 @@
         <nav class="col-3 col-lg-2 d-none d-md-block sidebar mt-topbar" id="left-bar" data-simplebar>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${selected_record eq null} ? 'active'" href="?">
+                    <a class="nav-link nav-link-dash-board" th:classappend="${selected_record eq null} ? 'active'"
+                       href="?">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -153,7 +154,9 @@
                 <!--suppress ThymeleafVariablesResolveInspection -->
                 <pre class="col-12" th:text="${selected_record.summary.config_intro}"></pre>
             </div>
-            <div class="row overflow-auto" th:if="${selected_record.scores != null}">
+            <div class="row scrollable-table-wrapper" th:if="${selected_record.scores != null}"
+                 data-simplebar
+                 data-simplebar-auto-hide="false">
 
                 <table id="summary-table" class="table">
                     <thead>
@@ -178,41 +181,45 @@
                     </tbody>
                 </table>
             </div>
-            <div class="row p-2">
-                    <form class="form-inline ml-auto mr-md-5 pr-md-5">
-                        <label for="table-digits-range">Digits: </label>
-                        <!--suppress XmlUnboundNsPrefix -->
-                        <input v-model="digits" type="range" id="table-digits-range" min="2"
-                               max="4" v-on:change="change"/>
-                    </form>
+            <div class="row p-3">
+                <form class="form-inline ml-auto mr-md-5 pr-md-5">
+                    <label for="table-digits-range">Digits: </label>
+                    <!--suppress XmlUnboundNsPrefix -->
+                    <input v-model="digits" type="range" id="table-digits-range" min="2"
+                           max="4" v-on:change="change"/>
+                </form>
             </div>
-            <nav id="nav-detail-panels" class="nav nav-pills nav-justified" role="tablist">
-                <div class="btn btn-link nav-link nav-item nav-cat active not-loaded" id="nav-details-training-tab"
-                     data-bs-toggle="tab" data-bs-target="#nav-details-training" role="tab"
-                     aria-controls="nav-details-training" aria-selected="true"
-                     data-href="training-curves"><span>Training</span>
-                </div>
-                <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-models-tab"
-                     data-bs-toggle="tab" data-bs-target="#nav-details-models" role="tab"
-                     aria-controls="nav-details-models" aria-selected="true"
-                     data-href="models-structures"><span>Models</span>
-                </div>
-                <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-log-tab"
-                     data-bs-toggle="tab" data-bs-target="#nav-details-log" role="tab"
-                     aria-controls="nav-details-log not-loaded" aria-selected="true"
-                     data-href="log-file"><span>Log</span>
-                </div>
-                <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-config-tab"
-                     data-bs-toggle="tab" data-bs-target="#nav-details-config" role="tab"
-                     aria-controls="nav-details-config" aria-selected="true"
-                     data-href="config-file"><span>Config</span>
-                </div>
-            </nav>
+            <div class="row p-3">
+                <nav id="nav-detail-panels" class="nav nav-pills nav-justified col-12" role="tablist">
+                    <div class="btn btn-link nav-link nav-item nav-cat active not-loaded" id="nav-details-training-tab"
+                         data-bs-toggle="tab" data-bs-target="#nav-details-training" role="tab"
+                         aria-controls="nav-details-training" aria-selected="true"
+                         data-href="training-curves"><span>Training</span>
+                    </div>
+                    <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-models-tab"
+                         data-bs-toggle="tab" data-bs-target="#nav-details-models" role="tab"
+                         aria-controls="nav-details-models" aria-selected="true"
+                         data-href="models-structures"><span>Models</span>
+                    </div>
+                    <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-log-tab"
+                         data-bs-toggle="tab" data-bs-target="#nav-details-log" role="tab"
+                         aria-controls="nav-details-log not-loaded" aria-selected="true"
+                         data-href="log-file"><span>Log</span>
+                    </div>
+                    <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-config-tab"
+                         data-bs-toggle="tab" data-bs-target="#nav-details-config" role="tab"
+                         aria-controls="nav-details-config" aria-selected="true"
+                         data-href="config-file"><span>Config</span>
+                    </div>
+                </nav>
+            </div>
             <div class="tab-content">
                 <div class="tab-pane fade show active container-fluid" id="nav-details-training" role="tabpanel"
                      aria-labelledby="nav-details-training-tab"
                      th:href="@{/api/meow-floorcreep/history/(record-id=${selected_record.folderName})}">
-                    <nav class="details-pagination" th:if="${selected_record.scores}"
+                    <div class="row p-2">
+                        <div class="col-2 col-1-md">Choose Fold:</div>
+                    <nav class="details-pagination col-10" th:if="${selected_record.scores}"
                          aria-label="Page navigation indicating which fold it is of among k-fold validation results.">
                         <ul class="pagination" id="pagination">
                             <li class="page-item disabled page-previous">
@@ -235,6 +242,7 @@
                             </li>
                         </ul>
                     </nav>
+                    </div>
                     <div class="row" id="training-charts-host"></div>
                     <div class="d-none" id="training-charts-template-wrapper">
                         <div class="col-12 col-md-6 col-lg-4 chart-wrapper">

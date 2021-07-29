@@ -3,6 +3,19 @@
 /*    color: black;*/
 /*}*/
 
+
+.scrollable-table-wrapper > * .simplebar-scrollbar::before {
+    background-color: #c1c1c1;
+}
+
+.scrollable-table-wrapper > .simplebar-track.simplebar-horizontal {
+    height: 16px !important;
+}
+
+.scrollable-table-wrapper > * .simplebar-scrollbar {
+    height: 12px !important;
+}
+
 .nav-cat.active {
     background: transparent !important;
     outline: none;
@@ -10,14 +23,14 @@
 
 .nav-cat.active span {
     background: #57A6FF77 !important;
-    border-radius: 50px;
+    border-radius: 30px;
     padding: .32rem .64rem;
 }
 
-#models-summary-host img{
+#models-summary-host img {
     max-width: 100%;
 }
 
-#nav-details-prediction img{
+#nav-details-prediction img {
     width: 100%;
 }
