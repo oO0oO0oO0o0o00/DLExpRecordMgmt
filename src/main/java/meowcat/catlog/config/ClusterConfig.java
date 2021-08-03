@@ -27,7 +27,7 @@ public class ClusterConfig {
     private static final String SFTP_DIRECT_URL_TEMPLATE = "sftp://omnisky:linux123@";
     private static final String DIRECT_IP_TEMPLATE = "172.21.7.";
     private static final String SFTP_PFW_URL_TEMPLATE = "sftp://omnisky:linux123@localhost:";
-    private static final String LOCAL_URL_TEMPLATE = "file://";
+    private static final String LOCAL_URL_TEMPLATE = "file://home/omnisky";
 
     @Value("${meowcat.under_port_fw}")
     private boolean underPortFw;
