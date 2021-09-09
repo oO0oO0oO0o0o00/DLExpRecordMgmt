@@ -1,10 +1,10 @@
-package meowcat.catlog.controller.meow_floorcreep;
+package meowcat.catlog.controller;
 
-import meowcat.catlog.model.meow_floorcreep.ExperimentRecord;
-import meowcat.catlog.service.meow_floorcreep.MeowService;
+import meowcat.catlog.config.ClusterConfig;
+import meowcat.catlog.model.ExperimentRecord;
+import meowcat.catlog.service.MeowService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-@Controller("meow-floorcreep-controller")
-@RequestMapping(value = "/meow-floorcreep")
+@Controller("meow-controller")
+@RequestMapping(value = "/projects/{project}")
 public class MeowController {
 
     private final MeowService meowService;
@@ -29,12 +29,15 @@ public class MeowController {
     }
 
     @GetMapping({"{selected}", ""})
-    public ModelAndView request(
+    public ModelAndView getProjectIndex(
+            @PathVariable String project,
             @PathVariable(value = "selected", required = false) String selectedRecordName) {
-        ModelAndView mv = new ModelAndView("meow_floorcreep/index");
+        ModelAndView mv = new ModelAndView("project/index");
         List<ExperimentRecord> allRecords = null;
         try {
-            allRecords = meowService.getRecords();
+            allRecords = meowService.getRecords(project);
+        } catch (ClusterConfig.MeowException me) {
+            return new ModelAndView("forward:/projects");
         } catch (Exception e) {
             logger.warn("cannot get records", e);
         }
@@ -56,17 +59,19 @@ public class MeowController {
 
     @GetMapping("config")
     public ModelAndView getConfigViewer(
-            @RequestParam("record-id") String recordId) throws IOException {
-        ModelAndView mv = new ModelAndView("meow_floorcreep/code_viewer");
-        mv.addObject("code", meowService.getRecord(recordId).getConfigFile());
+            @PathVariable String project,
+            @RequestParam("record-id") String recordId) throws IOException, ClusterConfig.MeowException {
+        ModelAndView mv = new ModelAndView("project/code_viewer");
+        mv.addObject("code", meowService.getRecord(project, recordId).getConfigFile());
         return mv;
     }
 
     @GetMapping("log")
     public ModelAndView getLogViewer(
-            @RequestParam("record-id") String recordId) throws IOException {
-        ModelAndView mv = new ModelAndView("meow_floorcreep/log_viewer");
-        mv.addObject("code", meowService.getRecord(recordId).getLogFile());
+            @PathVariable String project,
+            @RequestParam("record-id") String recordId) throws IOException, ClusterConfig.MeowException {
+        ModelAndView mv = new ModelAndView("project/log_viewer");
+        mv.addObject("code", meowService.getRecord(project, recordId).getLogFile());
         return mv;
     }
 }

@@ -143,10 +143,10 @@ function setPageActive(selector, active) {
     let $selector = $(selector);
     if (active) {
         $selector.addClass('active');
-        $selector.html($selector.html() + '<span class="sr-only">(current)</span>');
+        $selector.html($selector.html() + '<span class="visually-hidden">(current)</span>');
     } else {
         $selector.removeClass('active');
-        $(selector + ' .sr-only').remove();
+        $(selector + ' .visually-hidden').remove();
     }
 }
 
@@ -163,8 +163,8 @@ function displayModelsSummary(url, data) {
 
 function loadDetailsPageModels($pageElement) {
     let url = $('#nav-details-models').attr('href');
-    let baseUrl = new URL(url, location);
-    baseUrl = new URL(baseUrl.searchParams.get("record-id"), baseUrl);
+    let currentUrl = new URL(url, location);
+    let baseUrl = new URL(currentUrl.searchParams.get("project") + '/' + currentUrl.searchParams.get("record-id"), currentUrl);
     $.ajax({
         url: url,
         dataType: 'json',
@@ -298,7 +298,7 @@ $(document).ready(e => {
             change() {
                 for (let row of $('#summary-table tbody tr')) {
                     let $row = $(row);
-                    let values = $row.find('td .digits').slice(1).toArray()
+                    let values = $row.find('td .digits').slice(2).toArray()
                         .map(e => parseFloat($(e).attr('data-value')))
                         .filter(e => !isNaN(e))
                     let mean = values.reduce((a, b) => a + b, 0.0) / values.length;

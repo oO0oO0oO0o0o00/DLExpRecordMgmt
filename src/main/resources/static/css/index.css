@@ -37,7 +37,7 @@
 }
 
 .sidebar .nav-link.active {
-    color: var(--blue);
+    color: var(--bs-blue);
     background: #57A6FF55 !important;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .sidebar .nav-link.active:hover {
-    color: var(--blue);
+    color: var(--bs-blue);
     background: #57A6FF88 !important;
 }
 

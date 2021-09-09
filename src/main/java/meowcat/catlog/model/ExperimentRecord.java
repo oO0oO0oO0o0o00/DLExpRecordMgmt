@@ -1,4 +1,4 @@
-package meowcat.catlog.model.meow_floorcreep;
+package meowcat.catlog.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import meowcat.catlog.util.IoUtil;
@@ -35,8 +35,11 @@ public class ExperimentRecord implements Serializable {
 
     private String modelsSummaryIndex;
     private String hostName;
+    private String project;
 
-    public ExperimentRecord(FileObject directory) {
+    public ExperimentRecord(String project, String hostName, FileObject directory) {
+        this.project = project;
+        this.hostName = hostName;
         this.directory = directory;
     }
 
@@ -204,5 +207,13 @@ public class ExperimentRecord implements Serializable {
         try (var file = directory.getChild(s)) {
             return IoUtil.readJson(file);
         }
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
     }
 }

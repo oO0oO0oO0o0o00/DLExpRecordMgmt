@@ -2,7 +2,9 @@ package meowcat.catlog.util;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonValue;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.util.FileObjectUtils;
@@ -18,23 +20,13 @@ public class IoUtil {
 
     private static final Logger logger = LogManager.getLogger(IoUtil.class);
 
-    public static JsonValue readJson(File file) {
-        try {
-            FileReader reader = new FileReader(file);
-            JsonValue value = Json.parse(reader);
-            reader.close();
-            return value;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
 
     public static Map<String, Object> readJson(FileObject file) {
         try {
             //noinspection unchecked
-            return new ObjectMapper().readValue(new InputStreamReader(
-                    file.getContent().getInputStream()), Map.class);
+            return JsonMapper.builder().enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS)
+                    .build().readValue(new InputStreamReader(
+                            file.getContent().getInputStream()), Map.class);
         } catch (IOException | NullPointerException e) {
             String logging_text = "Cannot read json from FileObject";
             logger.warn("{}: {}", logging_text, e.getClass().getName());
