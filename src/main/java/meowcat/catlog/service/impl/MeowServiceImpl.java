@@ -39,6 +39,11 @@ public class MeowServiceImpl implements MeowService {
     private VFSOptions vfsOptions;
 
     @Override
+    public List<String> getProjects() {
+        return clusterConfig.getProjects();
+    }
+
+    @Override
     public List<ExperimentRecord> getRecords(String project) throws ClusterConfig.MeowException {
         AtomicBoolean hasError = new AtomicBoolean(false);
         List<ExperimentRecord> list = getResultsPathsOf(project).map(kv -> {

@@ -45,6 +45,10 @@ public class ClusterConfig {
     @Value("${meowcat.under_port_fw}")
     private boolean underPortFw;
 
+    public List<String> getProjects(){
+        return new ArrayList<>(PROJECTS.keySet());
+    }
+
     public Stream<Map.Entry<String, String>> getUrlsForProject(String name) throws MeowException {
         var proj = PROJECTS.get(name);
         if (proj == null) throw new MeowException();
