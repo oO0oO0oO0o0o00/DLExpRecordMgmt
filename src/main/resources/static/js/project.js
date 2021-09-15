@@ -182,26 +182,45 @@ function loadDetailsPageConfigFile($pageElement) {
     $pageElement.load($pageElement.attr('href'));
 }
 
+function loadDetailsCustomPage($pageElement, page) {
+    let url = new URL($pageElement.attr('href'), location);
+    url.searchParams.set('page', page);
+    $pageElement.load(url.href);
+}
+
 function loadDetailsPage(tab) {
-    if (!tab.hasClass('not-loaded')) return;
-    tab.removeClass('not-loaded');
+    let $paginationWrapper = $("#pagination-wrapper");
+    if (tab.attr("data-per-fold"))
+        $paginationWrapper.removeClass("d-none")
+    else
+        $paginationWrapper.addClass("d-none")
+    let notLoaded = tab.hasClass('not-loaded');
+    if (notLoaded) tab.removeClass('not-loaded');
     let selector = tab.attr('data-bs-target');
     let target = $(selector)
     switch (selector) {
         case '#nav-details-training':
             // loadDetailsPageTrainingCharts(target);
             if (page == null)
-                setDetailsPageTrainingChartsPage(1)
+                page = 1;
+            if (page !== tab.attr("data-page"))
+                setDetailsPageTrainingChartsPage(page);
             break;
         case '#nav-details-models':
-            loadDetailsPageModels(target);
+            if (notLoaded)
+                loadDetailsPageModels(target);
             break;
         case '#nav-details-log':
-            loadDetailsPageLogFile(target);
+            if (notLoaded)
+                loadDetailsPageLogFile(target);
             break;
         case '#nav-details-config':
-            loadDetailsPageConfigFile(target);
+            if (notLoaded)
+                loadDetailsPageConfigFile(target);
             break;
+        default:
+            if (notLoaded || page !== tab.attr("data-page"))
+                loadDetailsCustomPage(target, page);
     }
 }
 

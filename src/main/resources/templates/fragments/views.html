@@ -1,0 +1,27 @@
+<div xmlns:th="http://www.thymeleaf.org" class="meow-view-flow">
+
+    <!--/*@thymesVar id="view" type="java.util.Map<String,Object>"*/-->
+    <div th:fragment="flow(view)" class="row container">
+        <th:block th:each="child: ${view.data}">
+        <th:block th:replace="fragments/views.html :: resolve(${child})"/>
+        </th:block>
+    </div>
+
+    <div th:fragment="text(view)" th:text="${view.data}" class="row m-1"></div>
+
+    <div th:fragment="image(view)" class="row m-1">
+        <img th:src="@{/{src}(src=${view.data.src})}" th:alt="${view.data.description}"/>
+    </div>
+
+    <th:block th:fragment="resolve(view)">
+    <th:block th:if="${view.type=='flow'}">
+    <div th:replace="fragments/views.html :: flow(${view})"></div>
+    </th:block>
+    <th:block th:if="${view.type=='text'}">
+    <div th:replace="fragments/views.html :: text(${view})"></div>
+    </th:block>
+    <th:block th:if="${view.type=='image'}">
+    <div th:replace="fragments/views.html :: image(${view})"></div>
+    </th:block>
+    </th:block>
+</div>

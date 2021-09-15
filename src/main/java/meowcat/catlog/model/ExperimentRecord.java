@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 public class ExperimentRecord implements Serializable {
 
+    public static final String FOLDER_NAME_CUST_PAGES = "custom-pages";
+    public static final String FILENAME_CUST_PAGES_MANIFEST_JSON = "manifest.json";
     private final Logger logger = LogManager.getLogger(this);
 
     private final FileObject directory;
@@ -166,6 +168,22 @@ public class ExperimentRecord implements Serializable {
         return result;
     }
 
+    public List<CustomPage> getCustomPagesNames() throws FileSystemException {
+        var pagesDir = directory.getChild(FOLDER_NAME_CUST_PAGES);
+        if (pagesDir == null) return null;
+        List<CustomPage> ret = new ArrayList<>();
+        for (var pageDir : pagesDir.getChildren()) {
+            Map<String, Object> manifest;
+            try (var maniPath = pageDir.getChild(FILENAME_CUST_PAGES_MANIFEST_JSON)) {
+                if (!maniPath.isFile()) continue;
+                manifest = IoUtil.readJson(maniPath);
+            }
+            if (manifest == null) continue;
+            ret.add(new CustomPage(pageDir.getName().getBaseName(), manifest));
+        }
+        return ret;
+    }
+
     public boolean hasWeights() {
         try (var dir = directory.getChild("checkpoints")) {
             return dir != null && dir.isFolder();
@@ -215,5 +233,76 @@ public class ExperimentRecord implements Serializable {
 
     public void setProject(String project) {
         this.project = project;
+    }
+
+    public CustomPage getCustomPage(String pageId, int page) throws FileSystemException {
+        var dir = directory.getChild(FOLDER_NAME_CUST_PAGES).getChild(pageId);
+        Map<String, Object> manifest;
+        try (var maniFile = dir.getChild(FILENAME_CUST_PAGES_MANIFEST_JSON)) {
+            manifest = IoUtil.readJson(maniFile);
+        }
+        assert manifest != null;
+        var customPage = new CustomPage(dir.getName().getBaseName(), manifest);
+        customPage.setIthFold(page);
+        return customPage;
+    }
+
+
+    public FileObject getAttachment(String customPage, String fold, String name) throws FileSystemException {
+        FileObject result;
+        var dir = directory.getChild("custom-pages").getChild(customPage);
+        if (fold != null) dir = dir.getChild(fold);
+        return dir.getChild("attachments").getChild(name);
+    }
+
+    public class CustomPage {
+        private final String id;
+        private final String name;
+        private final boolean perFold;
+        private int ithFold;
+
+        private CustomPage(String id, String name, boolean perFold) {
+            this.id = id;
+            this.name = name;
+            this.perFold = perFold;
+        }
+
+        private CustomPage(String id, Map<String, Object> manifest) {
+            this.id = id;
+            this.name = (String) manifest.get("title");
+            this.perFold = (boolean) manifest.get("per_fold");
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean isPerFold() {
+            return perFold;
+        }
+
+        public Map<String, Object> getRoot() {
+            try {
+                var folder = directory.getChild(FOLDER_NAME_CUST_PAGES).getChild(id);
+                if (perFold) folder = folder.getChild(Integer.toString(ithFold));
+                try (var doc = folder.getChild("document.json")) {
+                    return IoUtil.readJson(doc);
+                }
+            } catch (FileSystemException e) {
+                return null;
+            }
+        }
+
+        public int getIthFold() {
+            return ithFold;
+        }
+
+        public void setIthFold(int ithFold) {
+            this.ithFold = ithFold;
+        }
     }
 }

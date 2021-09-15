@@ -34,6 +34,9 @@ public class ClusterConfig {
             ), "miya-helper", new Project(
                     "/wzy/miya-helper/experiments",
                     new String[]{"160"}
+            ), "charming-ball", new Project(
+                    "/wzy/charming-ball/experiments",
+                    new String[]{"125"}
             )
     );
 
@@ -45,7 +48,7 @@ public class ClusterConfig {
     @Value("${meowcat.under_port_fw}")
     private boolean underPortFw;
 
-    public List<String> getProjects(){
+    public List<String> getProjects() {
         return new ArrayList<>(PROJECTS.keySet());
     }
 

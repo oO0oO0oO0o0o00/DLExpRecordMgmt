@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service("meow-MeowService")
+@Service("MeowService")
 public class MeowServiceImpl implements MeowService {
 
     //    private static final String RESULTS_PATH = "/wzy/meow-floorcreep/experiments";

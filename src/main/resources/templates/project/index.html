@@ -192,33 +192,35 @@
             <div class="row p-3">
                 <nav id="nav-detail-panels" class="nav nav-pills nav-justified col-12" role="tablist">
                     <div class="btn btn-link nav-link nav-item nav-cat active not-loaded" id="nav-details-training-tab"
-                         data-bs-toggle="tab" data-bs-target="#nav-details-training" role="tab"
-                         aria-controls="nav-details-training" aria-selected="true"
+                         data-bs-toggle="tab" data-bs-target="#nav-details-training" role="tab" data-page="0"
+                         aria-controls="nav-details-training" aria-selected="true" data-per-fold="true"
                          data-href="training-curves"><span>Training</span>
                     </div>
                     <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-models-tab"
                          data-bs-toggle="tab" data-bs-target="#nav-details-models" role="tab"
-                         aria-controls="nav-details-models" aria-selected="true"
+                         aria-controls="nav-details-models" aria-selected="false"
                          data-href="models-structures"><span>Models</span>
                     </div>
                     <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-log-tab"
                          data-bs-toggle="tab" data-bs-target="#nav-details-log" role="tab"
-                         aria-controls="nav-details-log not-loaded" aria-selected="true"
+                         aria-controls="nav-details-log not-loaded" aria-selected="false"
                          data-href="log-file"><span>Log</span>
                     </div>
                     <div class="btn btn-link nav-link nav-item nav-cat not-loaded" id="nav-details-config-tab"
                          data-bs-toggle="tab" data-bs-target="#nav-details-config" role="tab"
-                         aria-controls="nav-details-config" aria-selected="true"
+                         aria-controls="nav-details-config" aria-selected="false"
                          data-href="config-file"><span>Config</span>
                     </div>
+                    <div class="btn btn-link nav-link nav-item nav-cat not-loaded"
+                         th:each="cpage: ${selected_record.customPagesNames}"
+                         th:id="'nav-details-'+${cpage.id}+'-tab'" data-bs-toggle="tab" data-page="0"
+                         th:attr="data-bs-target='#nav-details-'+${cpage.id}, aria-controls='#nav-details-'+${cpage.id}, data-href='cpage-'+${cpage.id}, data-per-fold=${cpage.perFold}?'true':'false'"
+                         role="tab" aria-selected="false"><span th:text="${cpage.name}"></span></div>
                 </nav>
             </div>
             <div class="tab-content">
-                <div class="tab-pane fade show active container-fluid" id="nav-details-training" role="tabpanel"
-                     aria-labelledby="nav-details-training-tab"
-                     th:href="@{/api/history/(project=${selected_record.project},record-id=${selected_record.folderName})}">
-                    <div class="row p-2">
-                        <div class="col-2 col-1-md">Choose Fold:</div>
+                <div class="row p-2" id="pagination-wrapper">
+                    <div class="col-2 col-1-md">Choose Fold:</div>
                     <nav class="details-pagination col-10" th:if="${selected_record.scores}"
                          aria-label="Page navigation indicating which fold it is of among k-fold validation results.">
                         <ul class="pagination" id="pagination">
@@ -242,7 +244,10 @@
                             </li>
                         </ul>
                     </nav>
-                    </div>
+                </div>
+                <div class="tab-pane fade show active container-fluid" id="nav-details-training" role="tabpanel"
+                     aria-labelledby="nav-details-training-tab"
+                     th:href="@{/api/history/(project=${selected_record.project},record-id=${selected_record.folderName})}">
                     <div class="row" id="training-charts-host"></div>
                     <div class="d-none" id="training-charts-template-wrapper">
                         <div class="col-12 col-md-6 col-lg-4 chart-wrapper">
@@ -270,6 +275,9 @@
                      aria-labelledby="nav-details-config-tab"
                      th:href="@{/projects/{project}/config/(project=${selected_record.project},record-id=${selected_record.folderName})}">
                 </div>
+                <div class="tab-pane fade show" th:each="cpage: ${selected_record.customPagesNames}"
+                     th:id="'nav-details-'+${cpage.id}" role="tabpanel"
+                     th:href="@{/projects/{project}/custom/(project=${selected_record.project},record-id=${selected_record.folderName},page-id=${cpage.id})}"></div>
             </div>
             </th:block>
             <th:block th:unless="${selected_record ne null}">
