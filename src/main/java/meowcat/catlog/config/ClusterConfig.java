@@ -37,13 +37,18 @@ public class ClusterConfig {
             ), "charming-ball", new Project(
                     "/wzy/charming-ball/experiments",
                     new String[]{"125"}
+            ), "meow-trpos", new Project(
+                    "/wzy/meow-trpos/experiments",
+                    new String[]{"125"}
             )
     );
 
     private static final String SFTP_DIRECT_URL_TEMPLATE = "sftp://omnisky:linux123@";
     private static final String DIRECT_IP_TEMPLATE = "172.21.7.";
     private static final String SFTP_PFW_URL_TEMPLATE = "sftp://omnisky:linux123@localhost:";
-    private static final String LOCAL_URL_TEMPLATE = "file://home/omnisky";
+    //    private static final String LOCAL_URL_TEMPLATE = "file://home/omnisky";
+    private static final String LOCAL_URL_TEMPLATE = "file://home/omnisky/";
+    private static final String LOCAL_PC_URL_TEMPLATE = "file://Users/omnisky/";
 
     @Value("${meowcat.under_port_fw}")
     private boolean underPortFw;
@@ -60,14 +65,15 @@ public class ClusterConfig {
     }
 
     private @NotNull String getDirectoryPath(String key, String directory) {
-        String prefix;
-        if (underPortFw) prefix = SFTP_PFW_URL_TEMPLATE + SFTP_PFW_PORTS.get(key);
-        else {
-            var ip = DIRECT_IP_TEMPLATE + key;
-            if (isItMe(ip)) prefix = LOCAL_URL_TEMPLATE;
-            else prefix = SFTP_DIRECT_URL_TEMPLATE + ip;
-        }
-        return prefix + directory;
+//        String prefix;
+//        if (underPortFw) prefix = SFTP_PFW_URL_TEMPLATE + SFTP_PFW_PORTS.get(key);
+//        else {
+//            var ip = DIRECT_IP_TEMPLATE + key;
+//            if (isItMe(ip)) prefix = LOCAL_URL_TEMPLATE;
+//            else prefix = SFTP_DIRECT_URL_TEMPLATE + ip;
+//        }
+//        return prefix + directory;
+        return (underPortFw ? LOCAL_PC_URL_TEMPLATE : LOCAL_URL_TEMPLATE) + directory;
     }
 
     private boolean isItMe(String ip) {
